@@ -1,1 +1,5 @@
+# Ignore data folder
 /notebook/data
+
+# Ignore Python virtual environment
+/notebook/venv
