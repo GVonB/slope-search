@@ -3,3 +3,11 @@
 
 # Ignore Python virtual environment
 /notebook/venv
+
+# Ignore Node dependencies
+/node_modules
+client/node_modules
+server/node_modules
+
+# Ignore MacOS file
+.DS_Store
