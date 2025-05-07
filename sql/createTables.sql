@@ -7,16 +7,16 @@ CREATE TABLE SkiArea (
     SkiAreaID VARCHAR(64) PRIMARY KEY,
     Country VARCHAR(50) NOT NULL,
     Region VARCHAR(50),
-    DownhillDistanceKm DECIMAL(5,2),
-    VerticalM INT,
-    MinElevationM INT,
-    MaxElevationM INT,
-    LiftCount INT,
+    DownhillDistanceKm DECIMAL(5,2) NULL,
+    VerticalM INT NULL,
+    MinElevationM INT NULL,
+    MaxElevationM INT NULL,
+    LiftCount INT NULL,
     RunConvention VARCHAR(20),
     OpenSkiMap VARCHAR(255),
     Geometry VARCHAR(20),
-    Latitude DECIMAL(9,6),
-    Longitude DECIMAL(9,6),
+    Latitude DECIMAL(9,6) NULL,
+    Longitude DECIMAL(9,6) NULL,
     Sources VARCHAR(255)
 );
 
@@ -49,17 +49,17 @@ CREATE TABLE Run (
     Difficulty VARCHAR(20),
     Color VARCHAR(10),
     Lit BOOLEAN,
-    InclinedLengthM DECIMAL(6,2),
-    DescentM INT,
-    AveragePitch DECIMAL(5,2),
-    MaxPitch DECIMAL(5,2),
-    MinElevationM INT,
-    MaxElevationM INT,
+    InclinedLengthM DECIMAL(6,2) NULL,
+    DescentM INT NULL,
+    AveragePitch DECIMAL(5,2) NULL,
+    MaxPitch DECIMAL(5,2) NULL,
+    MinElevationM INT NULL,
+    MaxElevationM INT NULL,
     DifficultyConvention VARCHAR(20),
     OpenSkiMap VARCHAR(255),
     Geometry VARCHAR(20),
-    Latitude DECIMAL(9,6),
-    Longitude DECIMAL(9,6),
+    Latitude DECIMAL(9,6) NULL,
+    Longitude DECIMAL(9,6) NULL,
     Sources VARCHAR(255)
 );
 
@@ -77,4 +77,3 @@ CREATE TABLE SkiAreaRun (
     FOREIGN KEY (SkiAreaID) REFERENCES SkiArea(SkiAreaID),
     FOREIGN KEY (RunID) REFERENCES Run(RunID)
 );
-
