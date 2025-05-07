@@ -11,3 +11,6 @@ server/node_modules
 
 # Ignore MacOS file
 .DS_Store
+
+# Ignore env configuration
+/server/.env
