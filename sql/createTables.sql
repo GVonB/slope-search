@@ -16,8 +16,7 @@ CREATE TABLE SkiArea (
     OpenSkiMap VARCHAR(255),
     Geometry VARCHAR(20),
     Latitude DECIMAL(9,6) NULL,
-    Longitude DECIMAL(9,6) NULL,
-    Sources VARCHAR(255)
+    Longitude DECIMAL(9,6) NULL
 );
 
 CREATE TABLE Favorites (
@@ -49,7 +48,7 @@ CREATE TABLE Run (
     Difficulty VARCHAR(20),
     Color VARCHAR(10),
     Lit BOOLEAN,
-    InclinedLengthM DECIMAL(6,2) NULL,
+    InclinedLengthM DECIMAL(8,2) NULL,
     DescentM INT NULL,
     AveragePitch DECIMAL(5,2) NULL,
     MaxPitch DECIMAL(5,2) NULL,
@@ -59,8 +58,7 @@ CREATE TABLE Run (
     OpenSkiMap VARCHAR(255),
     Geometry VARCHAR(20),
     Latitude DECIMAL(9,6) NULL,
-    Longitude DECIMAL(9,6) NULL,
-    Sources VARCHAR(255)
+    Longitude DECIMAL(9,6) NULL
 );
 
 CREATE TABLE RunName (
