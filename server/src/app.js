@@ -16,11 +16,6 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-db.connect(err => {
-    if (err) throw err;
-    console.log('Connected to MySQL!');
-});
-
 app.get('/', (req, res) => {
     res.send('Ski API is running!');
 });
