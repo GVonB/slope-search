@@ -1,11 +1,14 @@
 const express = require('express');
 const skiAreaRoutes = require('./routes/skiAreaRoutes');
+const skiAreaNameRoutes = require('./routes/skiAreaNameRoutes');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use('/api/ski-areas', skiAreaRoutes);
+
+app.use('/api/ski-areas', skiAreaNameRoutes);
 
 app.get('/', (req, res) => {
     res.send('Ski API is running!');
