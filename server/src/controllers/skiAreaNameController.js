@@ -4,7 +4,7 @@ exports.getNamesBySkiAreaId = (req, res) => {
     const { id } = req.params;
 
     const query = `
-        SELECT Name
+        SELECT Name AS name
         FROM SkiAreaName
         WHERE SkiAreaID = ?
     `;
