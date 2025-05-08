@@ -4,9 +4,19 @@ exports.getSkiAreas = (req, res) => {
     const { country, region, minVertical, maxVertical, orderBy, sortOrder, userId, favorites, minRunCount, maxRunCount, minMaxPitch } = req.query;
 
     // Using a SQL alias for each table for simplicity
+    // Note, due to the finite nature of color ratings in runs, but the multiple conventions,
+    // it's much more convenient to just count all colors, and then note to the user what
+    // convention is being used, if not already clear by the country which we've guaranteed
+    // to exist during data cleaning.
     let baseQuery = `
         SELECT sa.*, COUNT(r.RunID) AS runCount, 
                MAX(r.AveragePitch) AS maxAverageRunPitch
+               SUM(CASE WHEN r.Color = 'black' THEN 1 ELSE 0 END) AS blackCount,
+               SUM(CASE WHEN r.Color = 'blue' THEN 1 ELSE 0 END) AS blueCount,
+               SUM(CASE WHEN r.Color = 'green' THEN 1 ELSE 0 END) AS greenCount,
+               SUM(CASE WHEN r.Color = 'grey' THEN 1 ELSE 0 END) AS greyCount,
+               SUM(CASE WHEN r.Color = 'red' THEN 1 ELSE 0 END) AS redCount,
+               SUM(CASE WHEN r.Color = 'orange' THEN 1 ELSE 0 END) AS orangeCount
         FROM SkiArea sa
         LEFT JOIN SkiAreaRun sar ON sa.SkiAreaID = sar.SkiAreaID
         LEFT JOIN Run r ON sar.RunID = r.RunID
