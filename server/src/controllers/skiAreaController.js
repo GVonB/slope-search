@@ -8,15 +8,18 @@ exports.getSkiAreas = (req, res) => {
     // it's much more convenient to just count all colors, and then note to the user what
     // convention is being used, if not already clear by the country which we've guaranteed
     // to exist during data cleaning.
+    // MIN(san.Name) is used to just get one name for the primary
     let baseQuery = `
-        SELECT sa.*, COUNT(r.RunID) AS runCount, 
-               MAX(r.AveragePitch) AS maxAverageRunPitch
-               SUM(CASE WHEN r.Color = 'black' THEN 1 ELSE 0 END) AS blackCount,
-               SUM(CASE WHEN r.Color = 'blue' THEN 1 ELSE 0 END) AS blueCount,
-               SUM(CASE WHEN r.Color = 'green' THEN 1 ELSE 0 END) AS greenCount,
-               SUM(CASE WHEN r.Color = 'grey' THEN 1 ELSE 0 END) AS greyCount,
-               SUM(CASE WHEN r.Color = 'red' THEN 1 ELSE 0 END) AS redCount,
-               SUM(CASE WHEN r.Color = 'orange' THEN 1 ELSE 0 END) AS orangeCount
+        SELECT sa.*,
+                MIN(san.Name) AS primaryName,
+                COUNT(DISTINCT r.RunID) AS runCount, 
+                MAX(r.AveragePitch) AS maxAverageRunPitch,
+                SUM(CASE WHEN r.Color = 'black' THEN 1 ELSE 0 END) AS blackCount,
+                SUM(CASE WHEN r.Color = 'blue' THEN 1 ELSE 0 END) AS blueCount,
+                SUM(CASE WHEN r.Color = 'green' THEN 1 ELSE 0 END) AS greenCount,
+                SUM(CASE WHEN r.Color = 'grey' THEN 1 ELSE 0 END) AS greyCount,
+                SUM(CASE WHEN r.Color = 'red' THEN 1 ELSE 0 END) AS redCount,
+                SUM(CASE WHEN r.Color = 'orange' THEN 1 ELSE 0 END) AS orangeCount
         FROM SkiArea sa
         LEFT JOIN SkiAreaRun sar ON sa.SkiAreaID = sar.SkiAreaID
         LEFT JOIN Run r ON sar.RunID = r.RunID
