@@ -1,12 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/db');
+const skiAreaController = require('../controllers/skiAreaController');
 
-router.get('/', (req, res) => {
-    pool.query('SELECT * FROM SkiArea', (err, results) => {
-        if (err) return res.status(500).json({ error: 'Database query failed'});
-        res.json(results);
-    });
-});
+router.get('/', skiAreaController.getSkiAreas);
 
 module.exports = router;

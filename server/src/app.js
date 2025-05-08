@@ -1,16 +1,15 @@
 const express = require('express');
-const pool = require('./config/db');
+const skiAreaRoutes = require('./routes/skiAreaRoutes');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use('/api/ski-areas', skiAreaRoutes);
+
 app.get('/', (req, res) => {
     res.send('Ski API is running!');
 });
-
-const skiAreaRoutes = require('./routes/skiAreaRoutes');
-app.use('/api/ski-areas', skiAreaRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
