@@ -1,6 +1,5 @@
 const express = require('express');
 const skiAreaRoutes = require('./routes/skiAreaRoutes');
-const skiAreaNameRoutes = require('./routes/skiAreaNameRoutes');
 const runRoutes = require('./routes/runRoutes');
 require('dotenv').config();
 
