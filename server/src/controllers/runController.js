@@ -79,6 +79,9 @@ exports.getRuns = (req, res) => {
     }
 
     pool.query(baseQuery, params, (err, results) => {
-        handleQuery(err, results, res);
+        handleQuery(err, results, res, {
+            errorMessage: 'Failed to get ski runs',
+            notFoundMessage: 'No ski runs found matching the criteria'
+        });
     });
 };

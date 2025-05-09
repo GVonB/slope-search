@@ -96,6 +96,9 @@ exports.getSkiAreas = (req, res) => {
     }
 
     pool.query(baseQuery, params, (err, results) => {
-        handleQuery(err, results, res);
+        handleQuery(err, results, res, {
+            errorMessage: 'Failed to get ski areas',
+            notFoundMessage: 'No ski areas found matching the criteria'
+        });
     });
 };

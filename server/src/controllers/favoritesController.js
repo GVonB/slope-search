@@ -13,7 +13,10 @@ exports.getFavoritesByUserId = (req, res) => {
         GROUP BY sa.SkiAreaID
     `;
     pool.query(query, [userId], (err, results) => {
-        handleQuery(err, results, res);
+        handleQuery(err, results, res, {
+            errorMessage: 'Failed to get favorites',
+            notFoundMessage: 'No favorites found for this user'
+        });
     });
 };
 
@@ -22,7 +25,10 @@ exports.addFavorite = (req, res) => {
     const { userId, skiAreaId } = req.body;
     const query = 'INSERT INTO Favorites (UserID, SkiAreaID) VALUES (?, ?)';
     pool.query(query, [userId, skiAreaId], (err, results) => {
-        handleQuery(err, results, res);
+        handleQuery(err, results, res, {
+            errorMessage: 'Failed to add favorite',
+            successMessage: 'Favorite added successfully'
+        });
     });
 };
 
@@ -34,6 +40,10 @@ exports.removeFavorite = (req, res) => {
         WHERE UserID = ? AND SkiAreaID = ?
     `;
     pool.query(query, [userId, skiAreaId], (err, results) => {
-        handleQuery(err, results, res);
+        handleQuery(err, results, res, {
+            errorMessage: 'Failed to remove favorite',
+            notFoundMessage: 'Favorite not found or already removed',
+            successMessage: 'Favorite removed successfully'
+        });
     });
 };

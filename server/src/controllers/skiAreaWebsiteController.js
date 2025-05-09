@@ -11,6 +11,9 @@ exports.getWebsitesBySkiAreaId = (req, res) => {
     `;
 
     pool.query(query, [id], (err, results) => {
-        handleQuery(err, results, res);
+        handleQuery(err, results, res, {
+            errorMessage: 'Failed to get websites',
+            notFoundMessage: 'Websites not found for this ski area'
+        });
     })
 };

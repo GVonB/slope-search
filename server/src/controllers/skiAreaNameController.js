@@ -11,6 +11,9 @@ exports.getNamesBySkiAreaId = (req, res) => {
     `;
 
     pool.query(query, [id], (err, results) => {
-        handleQuery(err, results, res);
+        handleQuery(err, results, res, {
+            errorMessage: 'Failed to get names',
+            notFoundMessage: 'No names found for this ski area'
+        });
     });
 };

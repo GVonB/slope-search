@@ -16,16 +16,22 @@ exports.addUser = (req, res) => {
 exports.getAllUsers = (req, res) => {
     const query = 'SELECT * FROM User';
     pool.query(query, (err, results) => {
-        handleQuery(err, results, res);
-    })
-}
+        handleQuery(err, results, res, {
+            errorMessage: 'Failed to get users',
+            notFoundMessage: 'No users found'
+        });
+    });
+};
 
 // Delete user by ID
 exports.deleteUserById = (req, res) => {
     const { userId } = req.params;
     const query = 'DELETE FROM User WHERE UserID = ?';
     pool.query(query, [userId], (err, results) => {
-        if (err) return res.status(500).json({ error: 'Failed to delete user' });
-        res.json({ message: 'User deleted successfully' });
+        handleQuery(err, results, res, {
+            errorMessage: 'Failed to delete user',
+            notFoundMessage: 'User not found or already deleted',
+            successMessage: 'User deleted successfully'
+        });
     });
 };
