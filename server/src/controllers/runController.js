@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const handleQuery = require('../utils/handleQuery');
 
+// TODO: Redis caching for this query?
 exports.getRuns = (req, res) => {
 
     // For a useful query we need the run name, and the
@@ -20,7 +21,7 @@ exports.getRuns = (req, res) => {
         LEFT JOIN SkiAreaName san ON sa.SkiAreaID = san.SkiAreaID
         GROUP BY r.RunID
     `;
-    
+
     pool.query(query, (err, results) => {
         handleQuery(err, results, res);
     });

@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const handleQuery = require('../utils/handleQuery');
 
+// TODO: Redis caching for this query?
 exports.getSkiAreas = (req, res) => {
     const { country, region, minVertical, maxVertical, orderBy, sortOrder, userId, favorites, minRunCount, maxRunCount, minMaxPitch } = req.query;
 
