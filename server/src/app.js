@@ -8,6 +8,8 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(express.json());
+
 app.use('/api/ski-areas', skiAreaRoutes);
 
 app.use('/api/runs', runRoutes);
@@ -18,6 +20,11 @@ app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
     res.send('Ski API is running!');
+});
+
+// If no other routes match
+app.use((req, res) => {
+    res.status(404).json({ error: 'Route not found' });
 });
 
 app.listen(port, () => {
