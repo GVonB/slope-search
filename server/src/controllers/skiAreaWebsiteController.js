@@ -5,7 +5,7 @@ exports.getWebsitesBySkiAreaId = (req, res) => {
     const { id } = req.params;
 
     const query = `
-        SELECT WebsiteURL
+        SELECT WebsiteURL as websiteUrl
         FROM SkiAreaWebsite
         WHERE SkiAreaID = ?
     `;
