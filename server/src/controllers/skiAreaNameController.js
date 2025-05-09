@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const handleQuery = require('../utils/handleQuery');
 
 exports.getNamesBySkiAreaId = (req, res) => {
     const { id } = req.params;
@@ -10,7 +11,6 @@ exports.getNamesBySkiAreaId = (req, res) => {
     `;
 
     pool.query(query, [id], (err, results) => {
-        if (err) return res.status(500).json({ error: 'Database query failed'})
-        res.json(results);
+        handleQuery(err, results, res);
     });
 };
