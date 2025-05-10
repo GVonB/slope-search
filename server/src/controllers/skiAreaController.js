@@ -69,18 +69,12 @@ exports.getSkiAreas = (req, res) => {
         params.push(Number(minVertical));
     }
 
-    if (maxVertical) {
-        baseQuery += ' AND sa.VerticalM <= ?';
-        params.push(Number(maxVertical));
-    }
-
     baseQuery += ' GROUP BY sa.SkiAreaID';
 
     // Since these values are computed during the select, having is used, not where
     let havingConditions = [];
 
     if (minRunCount) havingConditions.push(`runCount >= ${Number(minRunCount)}`);
-    if (maxRunCount) havingConditions.push(`runCount <= ${Number(maxRunCount)}`);
     if (minMaxPitch) havingConditions.push(`maxAverageRunPitch >= ${Number(minMaxPitch)}`);
 
     if (havingConditions.length > 0) {
@@ -94,6 +88,8 @@ exports.getSkiAreas = (req, res) => {
             baseQuery += ` ORDER BY ${orderBy} ${orderDirection}`;
         }
     }
+
+    baseQuery += ' LIMIT 100';
 
     pool.query(baseQuery, params, (err, results) => {
         handleQuery(err, results, res, {

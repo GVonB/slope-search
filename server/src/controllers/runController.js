@@ -78,6 +78,8 @@ exports.getRuns = (req, res) => {
         }
     }
 
+    baseQuery += ' LIMIT 200';
+
     pool.query(baseQuery, params, (err, results) => {
         handleQuery(err, results, res, {
             errorMessage: 'Failed to get ski runs',
