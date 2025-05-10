@@ -85,7 +85,11 @@ exports.getSkiAreas = (req, res) => {
         const allowedOrder = ['VerticalM', 'maxAverageRunPitch', 'runCount', 'DownhillDistanceKm', 'LiftCount', 'MaxElevationM'];
         if (allowedOrder.includes(orderBy)) {
             const orderDirection = (sortOrder && sortOrder.toUpperCase() === 'ASC') ? 'ASC' : 'DESC';
-            baseQuery += ` ORDER BY ${orderBy} ${orderDirection}`;
+            if (orderDirection === 'ASC') {
+                baseQuery += ` ORDER BY ISNULL(${orderBy}), ${orderBy} ASC`;
+            } else {
+                baseQuery += ` ORDER BY ${orderBy} DESC`;
+            }
         }
     }
 
