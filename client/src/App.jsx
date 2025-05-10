@@ -16,7 +16,8 @@ function App() {
   const [minMaxAveragePitch, setMinMaxAveragePitch] = useState('');
   const [minRunCount, setMinRunCount] = useState('');
   const [minDownhillDistanceKm, setMinDownhillDistanceKm] = useState('');
-
+  const [userId, setUserId] = useState('');
+  
   // Only countries that exist in the db are used for options here.
   const countries = [
     'Albania', 'Andorra', 'Antarctica', 'Argentina', 'Armenia', 'Australia',
@@ -76,6 +77,15 @@ function App() {
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
+      <div className="mb-4 flex justify-between items-center">
+        <Input
+          placeholder="Enter username"
+          className="w-64"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+        />
+        <p className="text-sm text-gray-600">{userId ? `Logged in as: ${userId}` : 'Not logged in'}</p>
+      </div>
       <h1 className="text-3xl font-bold mb-6 text-center">Slope Search 🏔️</h1>
         <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
           <div className="flex flex-wrap gap-2">
