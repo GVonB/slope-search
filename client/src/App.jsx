@@ -121,16 +121,21 @@ function App() {
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <div className="mb-4 flex justify-between items-center">
-        <Input
-          placeholder="Enter username"
-          className="w-46"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <Button onClick={handleLogin}>Login</Button>
-        <p className="text-sm text-gray-600">
-          {userId ? `Logged in as: ${username}` : 'Not logged in'}
-        </p>
+        {userId ? (
+          <Button disabled variant="secondary">
+            Logged in as: {username}
+          </Button>
+        ) : (
+          <div className="flex gap-2 items-center">
+            <Input
+              placeholder="Enter username"
+              className="w-46"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <Button onClick={handleLogin}>Login</Button>
+          </div>
+        )}
       </div>
       <h1 className="text-3xl font-bold mb-6 text-center">Slope Search 🏔️</h1>
         <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
