@@ -26,6 +26,20 @@ function App() {
     'Taiwan', 'Tajikistan', 'Turkey', 'Ukraine', 'United Kingdom',
     'United States', 'Uzbekistan'
   ];
+
+  const orderByOptions = [
+    { label: 'Vertical', value: 'VerticalM' },
+    { label: 'Max Average Pitch', value: 'maxAverageRunPitch' },
+    { label: 'Run Count', value: 'runCount' },
+    { label: 'Downhill Distance', value: 'DownhillDistanceKm' },
+    { label: 'Lift Count', value: 'LiftCount' },
+    { label: 'Max Elevation', value: 'MaxElevationM' },
+  ];
+
+  const sortOptions = [
+    { label: 'Descending', value: 'DESC' },
+    { label: 'Ascending', value: 'ASC' },
+  ];
   
   const handleFetchSkiAreas = async () => {
     try {
@@ -77,23 +91,16 @@ function App() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  {orderBy || "Sort By"}
+                  {orderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {[
-                  "VerticalM",
-                  "maxAverageRunPitch",
-                  "runCount",
-                  "DownhillDistanceKm",
-                  "LiftCount",
-                  "MaxElevationM",
-                ].map((field) => (
+                {orderByOptions.map((option) => (
                   <DropdownMenuItem
-                    key={field}
-                    onSelect={() => setOrderBy(field)}
+                    key={option.value}
+                    onSelect={() => setOrderBy(option.value)}
                   >
-                    {field}
+                    {option.label}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -103,7 +110,7 @@ function App() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  {sortOrder || "Sort Order"}
+                  {sortOptions.find(o => o.value === sortOrder)?.label || "Sort Order"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -128,8 +135,8 @@ function App() {
         const colors = [
           { label: 'Green', color: 'bg-green-500', count: skiArea.greenCount },
           { label: 'Blue', color: 'bg-blue-500', count: skiArea.blueCount },
-          { label: 'Black', color: 'bg-black', count: skiArea.blackCount },
           { label: 'Red', color: 'bg-red-500', count: skiArea.redCount },
+          { label: 'Black', color: 'bg-black', count: skiArea.blackCount },
           { label: 'Grey', color: 'bg-gray-500', count: skiArea.greyCount },
           { label: 'Orange', color: 'bg-orange-500', count: skiArea.orangeCount },
         ];
