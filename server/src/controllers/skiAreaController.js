@@ -3,7 +3,7 @@ const handleQuery = require('../utils/handleQuery');
 
 // TODO: Redis caching for this query?
 exports.getSkiAreas = (req, res) => {
-    const { country, region, minVertical, orderBy, sortOrder, userId, favorites, minRunCount, minMaxPitch } = req.query;
+    const { country, region, minVertical, orderBy, sortOrder, userId, favorites, minRunCount, minMaxPitch, minDownhillDistanceKm  } = req.query;
 
     // Using a SQL alias for each table for simplicity
     // Note, due to the finite nature of color ratings in runs, but the multiple conventions,
@@ -67,6 +67,11 @@ exports.getSkiAreas = (req, res) => {
     if (minVertical) {
         baseQuery += ' AND sa.VerticalM >= ?';
         params.push(Number(minVertical));
+    }
+
+    if (minDownhillDistanceKm) {
+        baseQuery += ' AND sa.DownhillDistanceKm >= ?';
+        params.push(Number(minDownhillDistanceKm));
     }
 
     baseQuery += ' GROUP BY sa.SkiAreaID';
