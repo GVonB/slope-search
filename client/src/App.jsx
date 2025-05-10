@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -17,7 +17,23 @@ function App() {
   const [minRunCount, setMinRunCount] = useState('');
   const [minDownhillDistanceKm, setMinDownhillDistanceKm] = useState('');
   const [userId, setUserId] = useState('');
+  // Single selected region in dropdown
+  const [region, setRegion] = useState('');
+  // List of regions to populate dropdown
+  const [regions, setRegions] = useState([]);
 
+  // Use effect for getting regions based on the selected country
+  useEffect(() => {
+    if (selectedCountry) {
+      fetch(`/api/regions?country=${encodeURIComponent(selectedCountry)}`)
+        .then(res => res.json())
+        .then(data => setRegions(data))
+        .catch(err => console.error("Error fetching regions", err));
+    } else {
+      setRegions([]);
+      setRegion('');
+    }
+  }, [selectedCountry]);
   // Only countries that exist in the db are used for options here.
   const countries = [
     'Albania', 'Andorra', 'Antarctica', 'Argentina', 'Armenia', 'Australia',
@@ -59,6 +75,7 @@ function App() {
         query.append('minMaxPitch', slopeRatio);
       }
       if (minRunCount) query.append('minRunCount', minRunCount);
+      if (region) query.append('region', region);
       if (minDownhillDistanceKm) query.append('minDownhillDistanceKm', minDownhillDistanceKm);
       if (orderBy) query.append('orderBy', orderBy);
       if (sortOrder) query.append('sortOrder', sortOrder);
@@ -110,6 +127,25 @@ function App() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Region Dropdown */}
+            {regions.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {region || "All Regions"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setRegion("")}>All Regions</DropdownMenuItem>
+                  {regions.map(r => (
+                    <DropdownMenuItem key={r} onSelect={() => setRegion(r)}>
+                      {r}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {/* Sort By Dropdown */}
             <DropdownMenu>
