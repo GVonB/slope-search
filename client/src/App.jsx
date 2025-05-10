@@ -5,7 +5,24 @@ import { Card } from "@/components/ui/card"
 function App() {
   const [skiAreas, setSkiAreas] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(null);
-
+  
+  // Only countries that exist in the db are used for options here.
+  const countries = [
+    'Albania', 'Andorra', 'Antarctica', 'Argentina', 'Armenia', 'Australia',
+    'Austria', 'Azerbaijan', 'Belarus', 'Belgium', 'Bosnia and Herzegovina',
+    'Brazil', 'Bulgaria', 'Canada', 'Chile', 'China', 'Croatia', 'Cyprus',
+    'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Georgia',
+    'Germany', 'Greece', 'Greenland', 'Hungary', 'Iceland', 'India', 'Iran',
+    'Israel', 'Italy', 'Japan', 'Kazakhstan', 'Korea', 'Kosovo', 'Kyrgyzstan',
+    'Latvia', 'Lebanon', 'Lesotho', 'Liechtenstein', 'Lithuania', 'Mexico',
+    'Mongolia', 'Montenegro', 'Morocco', 'Netherlands', 'New Zealand',
+    'North Korea', 'North Macedonia', 'Norway', 'Pakistan', 'Poland',
+    'Portugal', 'Republic of Ireland', 'Romania', 'Russia', 'Serbia',
+    'Slovakia', 'Slovenia', 'South Africa', 'Spain', 'Sweden', 'Switzerland',
+    'Taiwan', 'Tajikistan', 'Turkey', 'Ukraine', 'United Kingdom',
+    'United States', 'Uzbekistan'
+  ];
+  
   const handleFetchSkiAreas = async () => {
     try {
       const res = await fetch('/api/ski-areas?region=Montana');
