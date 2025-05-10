@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 
 function App() {
@@ -9,6 +10,12 @@ function App() {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [orderBy, setOrderBy] = useState('');
   const [sortOrder, setSortOrder] = useState('DESC');
+  const [minVertical, setMinVertical] = useState('');
+  // If this sounds confusing, it's not. Take all runs at a ski area, average their pitch.
+  // This gives us the "steepest" run, now set a minimum steepness to query.
+  const [minMaxAveragePitch, setMinMaxAveragePitch] = useState('');
+  const [minRunCount, setMinRunCount] = useState('');
+  const [minDownhillDistanceKm, setMinDownhillDistanceKm] = useState('');
 
   // Only countries that exist in the db are used for options here.
   const countries = [
@@ -45,6 +52,13 @@ function App() {
     try {
       const query = new URLSearchParams();
       if (selectedCountry) query.append('country', selectedCountry);
+      if (minVertical) query.append('minVertical', minVertical);
+      if (minMaxAveragePitch) {
+        const slopeRatio = Math.tan((minMaxAveragePitch * Math.PI) / 180);
+        query.append('minMaxPitch', slopeRatio);
+      }
+      if (minRunCount) query.append('minRunCount', minRunCount);
+      if (minDownhillDistanceKm) query.append('minDownhillDistanceKm', minDownhillDistanceKm);
       if (orderBy) query.append('orderBy', orderBy);
       if (sortOrder) query.append('sortOrder', sortOrder);
 
@@ -123,7 +137,36 @@ function App() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-
+          <div className="flex gap-2">
+          <Input
+            type="number"
+            placeholder="Min Vertical (m)"
+            value={minVertical}
+            onChange={(e) => setMinVertical(e.target.value)}
+            className="w-36"
+          />
+          <Input
+            type="number"
+            placeholder="Min Max Avg Pitch (°)"
+            value={minMaxAveragePitch}
+            onChange={(e) => setMinMaxAveragePitch(e.target.value)}
+            className="w-44"
+          />
+          <Input
+            type="number"
+            placeholder="Min Run Count"
+            value={minRunCount}
+            onChange={(e) => setMinRunCount(e.target.value)}
+            className="w-36"
+          />
+          <Input
+            type="number"
+            placeholder="Min Downhill Dist (km)"
+            value={minDownhillDistanceKm}
+            onChange={(e) => setMinDownhillDistanceKm(e.target.value)}
+            className="w-48"
+          />
+        </div>
           <Button onClick={handleFetchSkiAreas}>Load Ski Areas</Button>
         </div>
 
