@@ -69,7 +69,7 @@ function App() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  {selectedCountry || "Select Country"}
+                  {selectedCountry || "All Countries"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
