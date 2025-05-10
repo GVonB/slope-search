@@ -17,11 +17,27 @@ function App() {
   const [minRunCount, setMinRunCount] = useState('');
   const [minDownhillDistanceKm, setMinDownhillDistanceKm] = useState('');
   const [userId, setUserId] = useState('');
+  const [username, setUsername] = useState('');
   // Single selected region in dropdown
   const [region, setRegion] = useState('');
   // List of regions to populate dropdown
   const [regions, setRegions] = useState([]);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
 
+
+  const handleLogin = async () => {
+    try {
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username }),
+        });
+        const data = await res.json();
+        setUserId(data.userId);
+    } catch (err) {
+      console.error('Login error:', err);
+    }
+  };
   // Use effect for getting regions based on the selected country
   useEffect(() => {
     if (selectedCountry) {
@@ -82,6 +98,16 @@ function App() {
 
       const res = await fetch(`/api/ski-areas?${query.toString()}`);
       const data = await res.json();
+
+      // If favorites only is toggled, get all favorites and only show matching ids with
+      // filtered results
+      if (favoritesOnly && userId) {
+        const favRes = await fetch(`/api/favorites/${userId}`);
+        const favoriteData = await favRes.json();
+        const favoriteIDs = new Set(favoriteData.map(fav => fav.SkiAreaID || fav.skiAreaId));
+
+        data = data.filter(area => favoriteIDs.has(area.skiAreaId));
+      }
       setSkiAreas(data);
     } catch (error) {
       console.error('Error fetching ski areas:', error);
@@ -97,11 +123,14 @@ function App() {
       <div className="mb-4 flex justify-between items-center">
         <Input
           placeholder="Enter username"
-          className="w-64"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
+          className="w-46"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
-        <p className="text-sm text-gray-600">{userId ? `Logged in as: ${userId}` : 'Not logged in'}</p>
+        <Button onClick={handleLogin}>Login</Button>
+        <p className="text-sm text-gray-600">
+          {userId ? `Logged in as: ${username}` : 'Not logged in'}
+        </p>
       </div>
       <h1 className="text-3xl font-bold mb-6 text-center">Slope Search 🏔️</h1>
         <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
@@ -182,6 +211,13 @@ function App() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <Button
+              variant={favoritesOnly ? "default" : "outline"}
+              onClick={() => setFavoritesOnly(prev => !prev)}
+            >
+              {favoritesOnly ? "✅ Showing Favorites Only" : "Show Favorites Only"}
+            </Button>
           </div>
           <div className="flex gap-2">
             <Button onClick={handleFetchSkiAreas}>Load Ski Areas</Button>
