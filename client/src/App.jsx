@@ -120,7 +120,7 @@ function App() {
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
-      <div className="mb-4 flex justify-between items-center">
+      <div className="mb-4 flex justify-end items-center">
         {userId ? (
           <Button disabled variant="secondary">
             Logged in as: {username}
