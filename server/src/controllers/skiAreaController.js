@@ -3,7 +3,7 @@ const handleQuery = require('../utils/handleQuery');
 
 // TODO: Redis caching for this query?
 exports.getSkiAreas = (req, res) => {
-    const { country, region, minVertical, maxVertical, orderBy, sortOrder, userId, favorites, minRunCount, maxRunCount, minMaxPitch } = req.query;
+    const { country, region, minVertical, orderBy, sortOrder, userId, favorites, minRunCount, minMaxPitch } = req.query;
 
     // Using a SQL alias for each table for simplicity
     // Note, due to the finite nature of color ratings in runs, but the multiple conventions,
