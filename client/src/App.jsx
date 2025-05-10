@@ -77,8 +77,8 @@ function App() {
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center">Slope Search 🏔️</h1>
-        <div className="flex flex-wrap items-center justify-between mb-6 gap-2">
-          <div className="flex gap-2">
+        <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
+          <div className="flex flex-wrap gap-2">
             {/* Country Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -138,36 +138,54 @@ function App() {
             </DropdownMenu>
           </div>
           <div className="flex gap-2">
+            <Button onClick={handleFetchSkiAreas}>Load Ski Areas</Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setSelectedCountry('');
+                setOrderBy('');
+                setSortOrder('DESC');
+                setMinVertical('');
+                setMinMaxAveragePitch('');
+                setMinRunCount('');
+                setMinDownhillDistanceKm('');
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap justify-between gap-2 mb-6">
+          {/* Inputs row*/}
           <Input
             type="number"
             placeholder="Min Vertical (m)"
             value={minVertical}
             onChange={(e) => setMinVertical(e.target.value)}
-            className="w-36"
+            className="w-46"
           />
           <Input
             type="number"
             placeholder="Min Max Avg Pitch (°)"
             value={minMaxAveragePitch}
             onChange={(e) => setMinMaxAveragePitch(e.target.value)}
-            className="w-44"
+            className="w-46"
           />
           <Input
             type="number"
             placeholder="Min Run Count"
             value={minRunCount}
             onChange={(e) => setMinRunCount(e.target.value)}
-            className="w-36"
+            className="w-46"
           />
           <Input
             type="number"
             placeholder="Min Downhill Dist (km)"
             value={minDownhillDistanceKm}
             onChange={(e) => setMinDownhillDistanceKm(e.target.value)}
-            className="w-48"
+            className="w-46"
           />
-        </div>
-          <Button onClick={handleFetchSkiAreas}>Load Ski Areas</Button>
         </div>
 
       {skiAreas.map((skiArea, index) => {
