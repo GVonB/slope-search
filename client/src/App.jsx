@@ -138,112 +138,94 @@ function App() {
         )}
       </div>
       <h1 className="text-3xl font-bold mb-6 text-center">Slope Search 🏔️</h1>
-        <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
-          <div className="flex flex-wrap gap-2">
-            {/* Country Dropdown */}
+        <div className="flex flex-wrap mb-4 gap-2">
+          {/* Country Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                {selectedCountry || "All Countries"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => setSelectedCountry("")}>
+                All Countries
+              </DropdownMenuItem>
+              {countries.map((country) => (
+                <DropdownMenuItem
+                  key={country}
+                  onSelect={() => setSelectedCountry(country)}
+                >
+                  {country}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Region Dropdown */}
+          {regions.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  {selectedCountry || "All Countries"}
+                  {region || "All Regions"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onSelect={() => setSelectedCountry("")}>
-                  All Countries
-                </DropdownMenuItem>
-                {countries.map((country) => (
-                  <DropdownMenuItem
-                    key={country}
-                    onSelect={() => setSelectedCountry(country)}
-                  >
-                    {country}
+                <DropdownMenuItem onSelect={() => setRegion("")}>All Regions</DropdownMenuItem>
+                {regions.map(r => (
+                  <DropdownMenuItem key={r} onSelect={() => setRegion(r)}>
+                    {r}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+          )}
 
-            {/* Region Dropdown */}
-            {regions.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
-                    {region || "All Regions"}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => setRegion("")}>All Regions</DropdownMenuItem>
-                  {regions.map(r => (
-                    <DropdownMenuItem key={r} onSelect={() => setRegion(r)}>
-                      {r}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {/* Sort By Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  {orderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {orderByOptions.map((option) => (
-                  <DropdownMenuItem
-                    key={option.value}
-                    onSelect={() => setOrderBy(option.value)}
-                  >
-                    {option.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Sort Order Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  {sortOptions.find(o => o.value === sortOrder)?.label || "Sort Order"}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onSelect={() => setSortOrder("DESC")}>
-                  Descending
+          {/* Sort By Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                {orderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {orderByOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onSelect={() => setOrderBy(option.value)}
+                >
+                  {option.label}
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSortOrder("ASC")}>
-                  Ascending
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            <Button
-              variant={favoritesOnly ? "default" : "outline"}
-              onClick={() => setFavoritesOnly(prev => !prev)}
-            >
-              {favoritesOnly ? "✅ Showing Favorites Only" : "Show Favorites Only"}
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={handleFetchSkiAreas}>Load Ski Areas</Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setSelectedCountry('');
-                setOrderBy('');
-                setSortOrder('DESC');
-                setMinVertical('');
-                setMinMaxAveragePitch('');
-                setMinRunCount('');
-                setMinDownhillDistanceKm('');
-              }}
-            >
-              Clear Filters
-            </Button>
-          </div>
+          {/* Sort Order Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                {sortOptions.find(o => o.value === sortOrder)?.label || "Sort Order"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={() => setSortOrder("DESC")}>
+                Descending
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setSortOrder("ASC")}>
+                Ascending
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button
+            variant={favoritesOnly ? "default" : "outline"}
+            onClick={() => setFavoritesOnly(prev => !prev)}
+          >
+            {favoritesOnly ? "✅ Showing Favorites Only" : "Show Favorites Only"}
+          </Button>
         </div>
+        
 
-        <div className="flex flex-wrap justify-between gap-2 mb-6">
+        <div className="flex flex-wrap justify-between gap-2 mb-4">
           {/* Inputs row*/}
           <Input
             type="number"
@@ -273,6 +255,29 @@ function App() {
             onChange={(e) => setMinDownhillDistanceKm(e.target.value)}
             className="w-46"
           />
+        </div>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <Button
+            className="w-full"
+            onClick={handleFetchSkiAreas}
+          >
+            Load Ski Areas
+          </Button>
+          <Button
+            className="w-full"
+            variant="secondary"
+            onClick={() => {
+              setSelectedCountry('');
+              setOrderBy('');
+              setSortOrder('DESC');
+              setMinVertical('');
+              setMinMaxAveragePitch('');
+              setMinRunCount('');
+              setMinDownhillDistanceKm('');
+            }}
+          >
+            Clear Filters
+          </Button>
         </div>
 
       {skiAreas.map((skiArea, index) => {
