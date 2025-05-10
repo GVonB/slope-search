@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 
 function App() {
   const [skiAreas, setSkiAreas] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(null);
-  
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [orderBy, setOrderBy] = useState('');
+  const [sortOrder, setSortOrder] = useState('DESC');
+
   // Only countries that exist in the db are used for options here.
   const countries = [
     'Albania', 'Andorra', 'Antarctica', 'Argentina', 'Armenia', 'Australia',
@@ -25,7 +29,12 @@ function App() {
   
   const handleFetchSkiAreas = async () => {
     try {
-      const res = await fetch('/api/ski-areas?region=Montana');
+      const query = new URLSearchParams();
+      if (selectedCountry) query.append('country', selectedCountry);
+      if (orderBy) query.append('orderBy', orderBy);
+      if (sortOrder) query.append('sortOrder', sortOrder);
+
+      const res = await fetch(`/api/ski-areas?${query.toString()}`);
       const data = await res.json();
       setSkiAreas(data);
     } catch (error) {
@@ -40,7 +49,76 @@ function App() {
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center">Slope Search 🏔️</h1>
-      <Button onClick={handleFetchSkiAreas} className="mb-6">Load Ski Areas</Button>
+        <div className="flex flex-wrap items-center justify-between mb-6 gap-2">
+          <div className="flex gap-2">
+            {/* Country Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  {selectedCountry || "Select Country"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onSelect={() => setSelectedCountry("")}>
+                  All Countries
+                </DropdownMenuItem>
+                {countries.map((country) => (
+                  <DropdownMenuItem
+                    key={country}
+                    onSelect={() => setSelectedCountry(country)}
+                  >
+                    {country}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Sort By Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  {orderBy || "Sort By"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {[
+                  "VerticalM",
+                  "maxAverageRunPitch",
+                  "runCount",
+                  "DownhillDistanceKm",
+                  "LiftCount",
+                  "MaxElevationM",
+                ].map((field) => (
+                  <DropdownMenuItem
+                    key={field}
+                    onSelect={() => setOrderBy(field)}
+                  >
+                    {field}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Sort Order Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  {sortOrder || "Sort Order"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onSelect={() => setSortOrder("DESC")}>
+                  Descending
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setSortOrder("ASC")}>
+                  Ascending
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <Button onClick={handleFetchSkiAreas}>Load Ski Areas</Button>
+        </div>
 
       {skiAreas.map((skiArea, index) => {
         const degrees = skiArea.maxAverageRunPitch
