@@ -17,7 +17,7 @@ function App() {
   const [minRunCount, setMinRunCount] = useState('');
   const [minDownhillDistanceKm, setMinDownhillDistanceKm] = useState('');
   const [userId, setUserId] = useState('');
-  
+
   // Only countries that exist in the db are used for options here.
   const countries = [
     'Albania', 'Andorra', 'Antarctica', 'Argentina', 'Armenia', 'Australia',
@@ -228,6 +228,32 @@ function App() {
               <div className="text-right">
                 <p>Max Pitch: {degrees !== null ? `${degrees.toFixed(1)}°` : '—'}</p>
                 <p>Convention: {skiArea.runConvention ?? '—'}</p>
+                <div className="mt-4">
+                {userId && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        await fetch('/api/favorites/add', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            userId,
+                            skiAreaId: skiArea.skiAreaId,
+                          }),
+                        });
+                        alert(`Favorited ${skiArea.primaryName}`);
+                      } catch (err) {
+                        console.error('Failed to add favorite:', err);
+                        alert('Error favoriting ski area');
+                      }
+                    }}
+                  >
+                    ❤️ Add to Favorites
+                  </Button>
+                )}
+                </div>
               </div>
             </div>
 
@@ -255,7 +281,6 @@ function App() {
                 </p>
               ))}
             </div>
-
             {expandedIndex === index && (
               <div className="mt-4 text-sm">
                 <h3 className="font-semibold mb-2">Additional Information</h3>

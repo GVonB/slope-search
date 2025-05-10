@@ -23,7 +23,7 @@ exports.getFavoritesByUserId = (req, res) => {
 // Add a favorite
 exports.addFavorite = (req, res) => {
     const { userId, skiAreaId } = req.body;
-    const query = 'INSERT INTO Favorites (UserID, SkiAreaID) VALUES (?, ?)';
+    const query = 'INSERT IGNORE INTO Favorites (UserID, SkiAreaID) VALUES (?, ?)';
     pool.query(query, [userId, skiAreaId], (err, results) => {
         handleQuery(err, results, res, {
             errorMessage: 'Failed to add favorite',
