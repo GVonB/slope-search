@@ -3,7 +3,7 @@ const handleQuery = require('../utils/handleQuery');
 
 // TODO: Redis caching for this query?
 exports.getSkiAreas = (req, res) => {
-    const { country, region, minVertical, orderBy, sortOrder, userId, favorites, minRunCount, minMaxPitch, minDownhillDistanceKm  } = req.query;
+    const { country, region, minVertical, orderBy, sortOrder, userId, favorites, minRunCount, minMaxPitch, minDownhillDistanceKm, limit  } = req.query;
 
     // Using a SQL alias for each table for simplicity
     // Note, due to the finite nature of color ratings in runs, but the multiple conventions,
@@ -97,8 +97,15 @@ exports.getSkiAreas = (req, res) => {
             }
         }
     }
+    
+    const maxLimit = 1000;
 
-    baseQuery += ' LIMIT 100';
+    if (req.query.limit && !isNaN(req.query.limit)) {
+        const limitVal = Math.min(parseInt(req.query.limit), maxLimit);
+        baseQuery += ` LIMIT ${limitVal}`;
+    } else {
+        baseQuery += ` LIMIT ${maxLimit}`;
+    }
 
     pool.query(baseQuery, params, (err, results) => {
         handleQuery(err, results, res, {

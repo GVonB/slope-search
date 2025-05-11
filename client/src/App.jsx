@@ -26,7 +26,7 @@ function App() {
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   // Handling favorites list
   const [favoriteIds, setFavoriteIds] = useState(new Set());
-
+  const [resultLimit, setResultLimit] = useState('100');
   // ---END USE STATES
 
   const handleLogin = async () => {
@@ -89,6 +89,14 @@ function App() {
     { label: 'Descending', value: 'DESC' },
     { label: 'Ascending', value: 'ASC' },
   ];
+
+  const limitOptions = [
+    { label: '5 Results', value: '5' },
+    { label: '10 Results', value: '10' },
+    { label: '25 Results', value: '25' },
+    { label: '100 Results', value: '100' },
+    { label: 'All Results', value: 'ALL' },
+  ];
   
   const handleFetchSkiAreas = async (forceFavoritesOnly = favoritesOnly) => {
     try {
@@ -115,7 +123,9 @@ function App() {
       if (minDownhillDistanceKm) query.append('minDownhillDistanceKm', minDownhillDistanceKm);
       if (orderBy) query.append('orderBy', orderBy);
       if (sortOrder) query.append('sortOrder', sortOrder);
-
+      if (resultLimit !== 'ALL') {
+        query.append('limit', resultLimit);
+      }
       const res = await fetch(`/api/ski-areas?${query.toString()}`);
       const data = await res.json();
       setSkiAreas(data);
@@ -225,6 +235,23 @@ function App() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                {limitOptions.find(o => o.value === resultLimit)?.label || "Result Limit"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {limitOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onSelect={() => setResultLimit(option.value)}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="flex flex-wrap justify-between gap-2 mb-4">
@@ -262,7 +289,10 @@ function App() {
         <div className={`grid ${userId ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-4`}>
           <Button
             className="w-full"
-            onClick={handleFetchSkiAreas}
+            onClick={() => {
+              setFavoritesOnly(false);
+              handleFetchSkiAreas(false);
+            }}
           >
             Load Ski Areas
           </Button>
