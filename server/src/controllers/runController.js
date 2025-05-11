@@ -3,7 +3,7 @@ const handleQuery = require('../utils/handleQuery');
 
 // TODO: Redis caching for this query?
 exports.getRuns = (req, res) => {
-    const { country, region, difficulty, color, minInclinedLength, minAveragePitch, orderBy, sortOrder, skiAreaId } = req.query;
+    const { country, region, difficulty, color, minInclinedLength, minAveragePitch, orderBy, sortOrder, skiAreaId, limit } = req.query;
 
     // For a useful query we need the run name, and the
     // name of the ski area the run is at. However,
@@ -82,7 +82,14 @@ exports.getRuns = (req, res) => {
         }
     }
 
-    baseQuery += ' LIMIT 200';
+    const maxLimit = 1000;
+
+    if (limit && !isNaN(limit)) {
+        const limitVal = Math.min(parseInt(limit), maxLimit);
+        baseQuery += ` LIMIT ${limitVal}`;
+    } else {
+        baseQuery += ` LIMIT ${maxLimit}`;
+    }
 
     pool.query(baseQuery, params, (err, results) => {
         handleQuery(err, results, res, {
