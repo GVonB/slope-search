@@ -332,23 +332,38 @@ function App() {
                     variant="outline"
                     size="sm"
                     onClick={async () => {
+                      const isFavorited = favoriteIds.has(skiArea.skiAreaId);
+
                       try {
-                        await fetch('/api/favorites/add', {
-                          method: 'POST',
+                        const endpoint = isFavorited
+                          ? '/api/favorites/remove'
+                          : '/api/favorites/add';
+
+                        await fetch(endpoint, {
+                          method: isFavorited ? 'DELETE' : 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
                             userId,
                             skiAreaId: skiArea.skiAreaId,
                           }),
                         });
-                        alert(`Favorited ${skiArea.primaryName}`);
+
+                        const updated = new Set(favoriteIds);
+                        if (isFavorited) {
+                          updated.delete(skiArea.skiAreaId);
+                        } else {
+                          updated.add(skiArea.skiAreaId);
+                        }
+                        setFavoriteIds(updated);
                       } catch (err) {
-                        console.error('Failed to add favorite:', err);
-                        alert('Error favoriting ski area');
+                        console.error('Failed to update favorite:', err);
+                        alert('Error updating favorite');
                       }
                     }}
                   >
-                    ❤️ Add to Favorites
+                    {favoriteIds.has(skiArea.skiAreaId)
+                      ? '💔 Remove Favorite'
+                      : '❤️ Add to Favorites'}
                   </Button>
                 )}
                 </div>
