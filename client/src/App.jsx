@@ -33,6 +33,13 @@ function App() {
   const [minRedCount, setMinRedCount] = useState('');
   const [minGreyCount, setMinGreyCount] = useState('');
   const [minOrangeCount, setMinOrangeCount] = useState('');
+  const [runCountry, setRunCountry] = useState('');
+  const [runRegion, setRunRegion] = useState('');
+  const [runDifficulty, setRunDifficulty] = useState('');
+  const [runColor, setRunColor] = useState('');
+  const [minInclinedLength, setMinInclinedLength] = useState('');
+  const [minAveragePitch, setMinAveragePitch] = useState('');
+  const [runs, setRuns] = useState([]);
   // Handles mode switch
   const [viewMode, setViewMode] = useState('areas'); // 'areas' or 'runs'
   // ---END USE STATES
@@ -148,6 +155,20 @@ function App() {
     }
   };
 
+  const handleFetchRuns = async () => {
+    const query = new URLSearchParams();
+    if (runCountry) query.append('country', runCountry);
+    if (runRegion) query.append('region', runRegion);
+    if (runDifficulty) query.append('difficulty', runDifficulty);
+    if (runColor) query.append('color', runColor);
+    if (minInclinedLength) query.append('minInclinedLength', minInclinedLength);
+    if (minAveragePitch) query.append('minAveragePitch', minAveragePitch);
+
+    const res = await fetch(`/api/runs?${query.toString()}`);
+    const data = await res.json();
+    setRuns(data);
+  };
+
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
@@ -180,329 +201,467 @@ function App() {
           Ski Runs
         </Button>
         </div>
-        <div className="flex flex-wrap mb-4 gap-2">
-          {/* Country Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                {selectedCountry || "All Countries"}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onSelect={() => setSelectedCountry("")}>
-                All Countries
-              </DropdownMenuItem>
-              {countries.map((country) => (
-                <DropdownMenuItem
-                  key={country}
-                  onSelect={() => setSelectedCountry(country)}
-                >
-                  {country}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
 
-          {/* Region Dropdown */}
-          {regions.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  {region || "All Regions"}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onSelect={() => setRegion("")}>All Regions</DropdownMenuItem>
-                {regions.map(r => (
-                  <DropdownMenuItem key={r} onSelect={() => setRegion(r)}>
-                    {r}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {/* Sort By Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                {orderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {orderByOptions.map((option) => (
-                <DropdownMenuItem
-                  key={option.value}
-                  onSelect={() => setOrderBy(option.value)}
-                >
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Sort Order Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                {sortOptions.find(o => o.value === sortOrder)?.label || "Sort Order"}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onSelect={() => setSortOrder("DESC")}>
-                Descending
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setSortOrder("ASC")}>
-                Ascending
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                {limitOptions.find(o => o.value === resultLimit)?.label || "Result Limit"}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {limitOptions.map((option) => (
-                <DropdownMenuItem
-                  key={option.value}
-                  onSelect={() => setResultLimit(option.value)}
-                >
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        <div className="flex flex-wrap justify-between gap-2 mb-4">
-          {/* Inputs row*/}
-          <Input
-            type="number"
-            placeholder="Min Vertical (m)"
-            value={minVertical}
-            onChange={(e) => setMinVertical(e.target.value)}
-            className="w-46"
-          />
-          <Input
-            type="number"
-            placeholder="Min Max Avg Pitch (°)"
-            value={minMaxAveragePitch}
-            onChange={(e) => setMinMaxAveragePitch(e.target.value)}
-            className="w-46"
-          />
-          <Input
-            type="number"
-            placeholder="Min Run Count"
-            value={minRunCount}
-            onChange={(e) => setMinRunCount(e.target.value)}
-            className="w-46"
-          />
-          <Input
-            type="number"
-            placeholder="Min Downhill Dist (km)"
-            value={minDownhillDistanceKm}
-            onChange={(e) => setMinDownhillDistanceKm(e.target.value)}
-            className="w-46"
-          />
-        </div>
-        <div className="grid grid-cols-6 gap-4 mb-4">
-          <Input
-            type="number"
-            placeholder="Min Greens"
-            value={minGreenCount}
-            onChange={(e) => setMinGreenCount(e.target.value)}
-          />
-          <Input
-            type="number"
-            placeholder="Min Blues"
-            value={minBlueCount}
-            onChange={(e) => setMinBlueCount(e.target.value)}
-          />
-          <Input
-            type="number"
-            placeholder="Min Blacks"
-            value={minBlackCount}
-            onChange={(e) => setMinBlackCount(e.target.value)}
-          />
-          <Input
-            type="number"
-            placeholder="Min Reds"
-            value={minRedCount}
-            onChange={(e) => setMinRedCount(e.target.value)}
-          />
-          <Input
-            type="number"
-            placeholder="Min Greys"
-            value={minGreyCount}
-            onChange={(e) => setMinGreyCount(e.target.value)}
-          />
-          <Input
-            type="number"
-            placeholder="Min Oranges"
-            value={minOrangeCount}
-            onChange={(e) => setMinOrangeCount(e.target.value)}
-          />
-        </div>
-        {/* This ternary operator changes columns from 2 to 3 if logged in*/}
-        <div className={`grid ${userId ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-4`}>
-          <Button
-            className="w-full"
-            onClick={() => {
-              setFavoritesOnly(false);
-              handleFetchSkiAreas(false);
-            }}
-          >
-            Load Ski Areas
-          </Button>
-          <Button
-            className="w-full"
-            variant="secondary"
-            onClick={() => {
-              setSelectedCountry('');
-              setOrderBy('');
-              setSortOrder('DESC');
-              setMinVertical('');
-              setMinMaxAveragePitch('');
-              setMinRunCount('');
-              setMinDownhillDistanceKm('');
-            }}
-          >
-            Clear Filters
-          </Button>
-          {/* Only show the "show favorites" button if "logged in"*/}
-          {userId && (
-            <Button
-              variant={favoritesOnly ? "default" : "outline"}
-              onClick={async () => {
-                const newValue = !favoritesOnly;
-                setFavoritesOnly(newValue);
-                handleFetchSkiAreas(newValue);
-              }}
-            >
-              {favoritesOnly ? "Back to Filters" : "Show Favorites"}
-            </Button>
-          )}
-        </div>
-
-      {skiAreas.map((skiArea, index) => {
-        const degrees = skiArea.maxAverageRunPitch
-          ? Math.atan(skiArea.maxAverageRunPitch) * (180 / Math.PI)
-          : null;
-
-        const colors = [
-          { label: 'Green', color: 'bg-green-500', count: skiArea.greenCount },
-          { label: 'Blue', color: 'bg-blue-500', count: skiArea.blueCount },
-          { label: 'Red', color: 'bg-red-500', count: skiArea.redCount },
-          { label: 'Black', color: 'bg-black', count: skiArea.blackCount },
-          { label: 'Grey', color: 'bg-gray-500', count: skiArea.greyCount },
-          { label: 'Orange', color: 'bg-orange-500', count: skiArea.orangeCount },
-        ];
-
-        return (
-          <Card key={skiArea.skiAreaId} onClick={() => toggleExpand(index)} className="mb-4 p-4 max-w-full md:max-w-5xl mx-auto bg-gray-100 cursor-pointer">
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <h2 className="text-xl font-bold">{skiArea.primaryName}</h2>
-                <p className="text-sm text-gray-600">{skiArea.country}, {skiArea.region}</p>
-              </div>
-              <div className="text-center">
-                <p>Vertical: {skiArea.verticalM ?? '—'} m</p>
-                <p>Lifts: {skiArea.liftCount ?? '—'}</p>
-                <p>Runs: {skiArea.runCount ?? '—'}</p>
-                <p>Downhill: {skiArea.downhillDistanceKm ?? '—'} km</p>
-              </div>
-              <div className="text-right">
-                <p>Max Pitch: {degrees !== null ? `${degrees.toFixed(1)}°` : '—'}</p>
-                <p>Convention: {skiArea.runConvention ?? '—'}</p>
-                <div className="mt-4">
-                {userId && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={async () => {
-                      const isFavorited = favoriteIds.has(skiArea.skiAreaId);
-
-                      try {
-                        const endpoint = isFavorited
-                          ? '/api/favorites/remove'
-                          : '/api/favorites/add';
-
-                        await fetch(endpoint, {
-                          method: isFavorited ? 'DELETE' : 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            userId,
-                            skiAreaId: skiArea.skiAreaId,
-                          }),
-                        });
-
-                        const updated = new Set(favoriteIds);
-                        if (isFavorited) {
-                          updated.delete(skiArea.skiAreaId);
-                        } else {
-                          updated.add(skiArea.skiAreaId);
-                        }
-                        setFavoriteIds(updated);
-
-                        if (favoritesOnly) {
-                          handleFetchSkiAreas(true);
-                        }
-                      } catch (err) {
-                        console.error('Failed to update favorite:', err);
-                        alert('Error updating favorite');
-                      }
-                    }}
-                  >
-                    {favoriteIds.has(skiArea.skiAreaId)
-                      ? '💔 Remove Favorite'
-                      : '❤️ Add to Favorites'}
+        {viewMode === 'areas' && (
+          <>
+            <div className="flex flex-wrap mb-4 gap-2">
+              {/* Country Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {selectedCountry || "All Countries"}
                   </Button>
-                )}
-                </div>
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setSelectedCountry("")}>
+                    All Countries
+                  </DropdownMenuItem>
+                  {countries.map((country) => (
+                    <DropdownMenuItem
+                      key={country}
+                      onSelect={() => setSelectedCountry(country)}
+                    >
+                      {country}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Region Dropdown */}
+              {regions.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                      {region || "All Regions"}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onSelect={() => setRegion("")}>All Regions</DropdownMenuItem>
+                    {regions.map(r => (
+                      <DropdownMenuItem key={r} onSelect={() => setRegion(r)}>
+                        {r}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* Sort By Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {orderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {orderByOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onSelect={() => setOrderBy(option.value)}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Sort Order Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {sortOptions.find(o => o.value === sortOrder)?.label || "Sort Order"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setSortOrder("DESC")}>
+                    Descending
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setSortOrder("ASC")}>
+                    Ascending
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {limitOptions.find(o => o.value === resultLimit)?.label || "Result Limit"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {limitOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onSelect={() => setResultLimit(option.value)}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
-            {/* Full-width stacked progress bar (always visible) */}
-            <div className="mt-2 flex w-full h-4 rounded overflow-hidden bg-gray-300">
-              {colors.map((c) => {
-                const percent = skiArea.runCount ? (c.count / skiArea.runCount) * 100 : 0;
+            <div className="flex flex-wrap justify-between gap-2 mb-4">
+              {/* Inputs row*/}
+              <Input
+                type="number"
+                placeholder="Min Vertical (m)"
+                value={minVertical}
+                onChange={(e) => setMinVertical(e.target.value)}
+                className="w-46"
+              />
+              <Input
+                type="number"
+                placeholder="Min Max Avg Pitch (°)"
+                value={minMaxAveragePitch}
+                onChange={(e) => setMinMaxAveragePitch(e.target.value)}
+                className="w-46"
+              />
+              <Input
+                type="number"
+                placeholder="Min Run Count"
+                value={minRunCount}
+                onChange={(e) => setMinRunCount(e.target.value)}
+                className="w-46"
+              />
+              <Input
+                type="number"
+                placeholder="Min Downhill Dist (km)"
+                value={minDownhillDistanceKm}
+                onChange={(e) => setMinDownhillDistanceKm(e.target.value)}
+                className="w-46"
+              />
+            </div>
+            <div className="grid grid-cols-6 gap-4 mb-4">
+              <Input
+                type="number"
+                placeholder="Min Greens"
+                value={minGreenCount}
+                onChange={(e) => setMinGreenCount(e.target.value)}
+              />
+              <Input
+                type="number"
+                placeholder="Min Blues"
+                value={minBlueCount}
+                onChange={(e) => setMinBlueCount(e.target.value)}
+              />
+              <Input
+                type="number"
+                placeholder="Min Blacks"
+                value={minBlackCount}
+                onChange={(e) => setMinBlackCount(e.target.value)}
+              />
+              <Input
+                type="number"
+                placeholder="Min Reds"
+                value={minRedCount}
+                onChange={(e) => setMinRedCount(e.target.value)}
+              />
+              <Input
+                type="number"
+                placeholder="Min Greys"
+                value={minGreyCount}
+                onChange={(e) => setMinGreyCount(e.target.value)}
+              />
+              <Input
+                type="number"
+                placeholder="Min Oranges"
+                value={minOrangeCount}
+                onChange={(e) => setMinOrangeCount(e.target.value)}
+              />
+            </div>
+            {/* This ternary operator changes columns from 2 to 3 if logged in*/}
+            <div className={`grid ${userId ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-4`}>
+              <Button
+                className="w-full"
+                onClick={() => {
+                  setFavoritesOnly(false);
+                  handleFetchSkiAreas(false);
+                }}
+              >
+                Load Ski Areas
+              </Button>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => {
+                  setSelectedCountry('');
+                  setOrderBy('');
+                  setSortOrder('DESC');
+                  setMinVertical('');
+                  setMinMaxAveragePitch('');
+                  setMinRunCount('');
+                  setMinDownhillDistanceKm('');
+                }}
+              >
+                Clear Filters
+              </Button>
+              {/* Only show the "show favorites" button if "logged in"*/}
+              {userId && (
+                <Button
+                  variant={favoritesOnly ? "default" : "outline"}
+                  onClick={async () => {
+                    const newValue = !favoritesOnly;
+                    setFavoritesOnly(newValue);
+                    handleFetchSkiAreas(newValue);
+                  }}
+                >
+                  {favoritesOnly ? "Back to Filters" : "Show Favorites"}
+                </Button>
+              )}
+            </div>
+            
+            {skiAreas.length > 0 ? (
+                skiAreas.map((skiArea, index) => {
+                  const degrees = skiArea.maxAverageRunPitch
+                    ? Math.atan(skiArea.maxAverageRunPitch) * (180 / Math.PI)
+                    : null;
+
+                const colors = [
+                  { label: 'Green', color: 'bg-green-500', count: skiArea.greenCount },
+                  { label: 'Blue', color: 'bg-blue-500', count: skiArea.blueCount },
+                  { label: 'Red', color: 'bg-red-500', count: skiArea.redCount },
+                  { label: 'Black', color: 'bg-black', count: skiArea.blackCount },
+                  { label: 'Grey', color: 'bg-gray-500', count: skiArea.greyCount },
+                  { label: 'Orange', color: 'bg-orange-500', count: skiArea.orangeCount },
+                ];
+
                 return (
-                  <div
-                    key={c.label}
-                    className={`${c.color} h-full`}
-                    style={{ width: `${percent}%` }}
-                    title={`${c.label}: ${c.count ?? 0} runs (${percent.toFixed(1)}%)`}
-                  />
-                );
-              })}
-            </div>
+                  <Card key={skiArea.skiAreaId} onClick={() => toggleExpand(index)} className="mb-4 p-4 max-w-full md:max-w-5xl mx-auto bg-gray-100 cursor-pointer">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <h2 className="text-xl font-bold">{skiArea.primaryName}</h2>
+                        <p className="text-sm text-gray-600">{skiArea.country}, {skiArea.region}</p>
+                      </div>
+                      <div className="text-center">
+                        <p>Vertical: {skiArea.verticalM ?? '—'} m</p>
+                        <p>Lifts: {skiArea.liftCount ?? '—'}</p>
+                        <p>Runs: {skiArea.runCount ?? '—'}</p>
+                        <p>Downhill: {skiArea.downhillDistanceKm ?? '—'} km</p>
+                      </div>
+                      <div className="text-right">
+                        <p>Max Pitch: {degrees !== null ? `${degrees.toFixed(1)}°` : '—'}</p>
+                        <p>Convention: {skiArea.runConvention ?? '—'}</p>
+                        <div className="mt-4">
+                        {userId && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              const isFavorited = favoriteIds.has(skiArea.skiAreaId);
 
-            {/* 2-row, 3-column color grid (always visible) */}
-            <div className="mt-2 grid grid-cols-3 gap-2 text-sm">
-              {colors.map((c) => (
-                <p key={c.label} className="flex items-center">
-                  <span className={`inline-block w-3 h-3 rounded-full mr-2 ${c.color}`}></span>
-                  {c.label}: {c.count ?? 0}
-                </p>
-              ))}
-            </div>
-            {expandedIndex === index && (
-              <div className="mt-4 text-sm">
-                <h3 className="font-semibold mb-2">Additional Information</h3>
-                <p>Min Elevation: {skiArea.minElevationM ?? '—'} m</p>
-                <p>Max Elevation: {skiArea.maxElevationM ?? '—'} m</p>
-                <p>Latitude: {skiArea.latitude ?? '—'}</p>
-                <p>Longitude: {skiArea.longitude ?? '—'}</p>
-                <p>
-                  Map: <a href={skiArea.openSkiMap} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">View on OpenSkiMap</a>
-                </p>
-              </div>
+                              try {
+                                const endpoint = isFavorited
+                                  ? '/api/favorites/remove'
+                                  : '/api/favorites/add';
+
+                                await fetch(endpoint, {
+                                  method: isFavorited ? 'DELETE' : 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    userId,
+                                    skiAreaId: skiArea.skiAreaId,
+                                  }),
+                                });
+
+                                const updated = new Set(favoriteIds);
+                                if (isFavorited) {
+                                  updated.delete(skiArea.skiAreaId);
+                                } else {
+                                  updated.add(skiArea.skiAreaId);
+                                }
+                                setFavoriteIds(updated);
+
+                                if (favoritesOnly) {
+                                  handleFetchSkiAreas(true);
+                                }
+                              } catch (err) {
+                                console.error('Failed to update favorite:', err);
+                                alert('Error updating favorite');
+                              }
+                            }}
+                          >
+                            {favoriteIds.has(skiArea.skiAreaId)
+                              ? '💔 Remove Favorite'
+                              : '❤️ Add to Favorites'}
+                          </Button>
+                        )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Full-width stacked progress bar (always visible) */}
+                    <div className="mt-2 flex w-full h-4 rounded overflow-hidden bg-gray-300">
+                      {colors.map((c) => {
+                        const percent = skiArea.runCount ? (c.count / skiArea.runCount) * 100 : 0;
+                        return (
+                          <div
+                            key={c.label}
+                            className={`${c.color} h-full`}
+                            style={{ width: `${percent}%` }}
+                            title={`${c.label}: ${c.count ?? 0} runs (${percent.toFixed(1)}%)`}
+                          />
+                        );
+                      })}
+                    </div>
+
+                    {/* 2-row, 3-column color grid (always visible) */}
+                    <div className="mt-2 grid grid-cols-3 gap-2 text-sm">
+                      {colors.map((c) => (
+                        <p key={c.label} className="flex items-center">
+                          <span className={`inline-block w-3 h-3 rounded-full mr-2 ${c.color}`}></span>
+                          {c.label}: {c.count ?? 0}
+                        </p>
+                      ))}
+                    </div>
+                    {expandedIndex === index && (
+                      <div className="mt-4 text-sm">
+                        <h3 className="font-semibold mb-2">Additional Information</h3>
+                        <p>Min Elevation: {skiArea.minElevationM ?? '—'} m</p>
+                        <p>Max Elevation: {skiArea.maxElevationM ?? '—'} m</p>
+                        <p>Latitude: {skiArea.latitude ?? '—'}</p>
+                        <p>Longitude: {skiArea.longitude ?? '—'}</p>
+                        <p>
+                          Map: <a href={skiArea.openSkiMap} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">View on OpenSkiMap</a>
+                        </p>
+                      </div>
+                    )}
+                  </Card>
+                );
+              })
+            ) : (
+              <p className="text-center text-gray-500 mt-4">No ski areas found. Adjust filters and try again.</p>
             )}
-          </Card>
-        );
-      })}
+          </>
+        )}
+
+        {/* TODO: Reusing a lot of code */}
+        {viewMode === 'runs' && (
+          <>
+            <div className="flex flex-wrap mb-4 gap-2">
+              {/* Country Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {selectedCountry || "All Countries"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setSelectedCountry("")}>
+                    All Countries
+                  </DropdownMenuItem>
+                  {countries.map((country) => (
+                    <DropdownMenuItem
+                      key={country}
+                      onSelect={() => setSelectedCountry(country)}
+                    >
+                      {country}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Region Dropdown */}
+              {regions.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                      {region || "All Regions"}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onSelect={() => setRegion("")}>All Regions</DropdownMenuItem>
+                    {regions.map(r => (
+                      <DropdownMenuItem key={r} onSelect={() => setRegion(r)}>
+                        {r}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* Sort By Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {orderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {orderByOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onSelect={() => setOrderBy(option.value)}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Sort Order Dropdown */}
+              {/*TODO: Custom run sort options */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {sortOptions.find(o => o.value === sortOrder)?.label || "Sort Order"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setSortOrder("DESC")}>
+                    Descending
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setSortOrder("ASC")}>
+                    Ascending
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    {limitOptions.find(o => o.value === resultLimit)?.label || "Result Limit"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {limitOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onSelect={() => setResultLimit(option.value)}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            
+            {runs.length > 0 ? (
+              <div className="space-y-4">
+                {runs.map((run) => (
+                  <Card key={run.runId} className="p-4 bg-white shadow">
+                    <h3 className="text-xl font-semibold mb-2">{run.primaryRunName || 'Unnamed Run'}</h3>
+                    <p><strong>Ski Area:</strong> {run.skiAreaName || '—'}</p>
+                    <p><strong>Color:</strong> {run.color}</p>
+                    <p><strong>Difficulty:</strong> {run.difficulty}</p>
+                    <p><strong>Inclined Length:</strong> {run.inclinedLengthM ?? '—'} m</p>
+                    <p><strong>Avg Pitch:</strong> {(run.averagePitch * 100).toFixed(1)}%</p>
+                    <p><strong>Max Pitch:</strong> {(run.maxPitch * 100).toFixed(1)}%</p>
+                    <p><strong>Lit:</strong> {run.lit ? 'Yes' : 'No'}</p>
+                    <a
+                      href={run.openSkiMap}
+                      className="text-blue-500 underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View on OpenSkiMap
+                    </a>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-500 mt-4">No runs loaded. Adjust filters and try again.</p>
+            )}
+          </>
+        )}
     </div>
   );
 }
