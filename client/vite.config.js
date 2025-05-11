@@ -3,12 +3,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 
+const isDocker = process.env.DOCKER === 'true';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      '/api': 'http://localhost:3000'
+      '/api': isDocker ? 'http://server:3000' : 'http://localhost:3000'
     }
   },
   resolve: {

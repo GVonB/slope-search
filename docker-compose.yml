@@ -1,10 +1,9 @@
-version: '3.8'
 services:
   client:
     build:
       context: ./client
     ports:
-      - "5173:5173"
+      - "4173:4173"
     depends_on:
       - server
 
@@ -19,12 +18,15 @@ services:
   mysql:
     image: mysql:8
     restart: always
+    command: --local-infile=1
     environment:
-      MYSQL_ROOT_PASSWORD: yourpassword
-      MYSQL_DATABASE: slope_search
+      DOCKER: "true"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
+      - ./notebook/data:/data
       - mysql-data:/var/lib/mysql
 
 volumes:
