@@ -220,7 +220,10 @@ function App() {
     if (runDifficulty) query.append('difficulty', runDifficulty);
     if (runColor) query.append('color', runColor);
     if (minInclinedLength) query.append('minInclinedLength', minInclinedLength);
-    if (minAveragePitch) query.append('minAveragePitch', minAveragePitch);
+    if (minAveragePitch) {
+      const slopeRatio = Math.tan((minAveragePitch * Math.PI) / 180);
+      query.append('minAveragePitch', slopeRatio);
+    }
     if (runSelectedSkiAreaId) query.append('skiAreaId', runSelectedSkiAreaId);
     if (orderBy) query.append('orderBy', orderBy);
     if (sortOrder) query.append('sortOrder', sortOrder);
