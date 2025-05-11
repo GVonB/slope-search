@@ -3,7 +3,11 @@ const handleQuery = require('../utils/handleQuery');
 
 // TODO: Redis caching for this query?
 exports.getSkiAreas = (req, res) => {
-    const { country, region, minVertical, orderBy, sortOrder, userId, favorites, minRunCount, minMaxPitch, minDownhillDistanceKm, limit  } = req.query;
+    const { country, region, minVertical, orderBy, sortOrder, userId, 
+        favorites, minRunCount, minMaxPitch, minDownhillDistanceKm, 
+        limit,  minBlackCount, minBlueCount, minGreenCount,
+        minRedCount, minGreyCount, minOrangeCount
+    } = req.query;
 
     // Using a SQL alias for each table for simplicity
     // Note, due to the finite nature of color ratings in runs, but the multiple conventions,
@@ -81,6 +85,12 @@ exports.getSkiAreas = (req, res) => {
 
     if (minRunCount) havingConditions.push(`runCount >= ${Number(minRunCount)}`);
     if (minMaxPitch) havingConditions.push(`maxAverageRunPitch >= ${Number(minMaxPitch)}`);
+    if (minBlackCount) havingConditions.push(`blackCount >= ${Number(minBlackCount)}`);
+    if (minBlueCount) havingConditions.push(`blueCount >= ${Number(minBlueCount)}`);
+    if (minGreenCount) havingConditions.push(`greenCount >= ${Number(minGreenCount)}`);
+    if (minRedCount) havingConditions.push(`redCount >= ${Number(minRedCount)}`);
+    if (minGreyCount) havingConditions.push(`greyCount >= ${Number(minGreyCount)}`);
+    if (minOrangeCount) havingConditions.push(`orangeCount >= ${Number(minOrangeCount)}`);
 
     if (havingConditions.length > 0) {
         baseQuery += ' HAVING ' + havingConditions.join(' AND ');
@@ -100,8 +110,8 @@ exports.getSkiAreas = (req, res) => {
     
     const maxLimit = 1000;
 
-    if (req.query.limit && !isNaN(req.query.limit)) {
-        const limitVal = Math.min(parseInt(req.query.limit), maxLimit);
+    if (limit && !isNaN(limit)) {
+        const limitVal = Math.min(parseInt(limit), maxLimit);
         baseQuery += ` LIMIT ${limitVal}`;
     } else {
         baseQuery += ` LIMIT ${maxLimit}`;

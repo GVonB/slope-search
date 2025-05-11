@@ -27,6 +27,12 @@ function App() {
   // Handling favorites list
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const [resultLimit, setResultLimit] = useState('100');
+  const [minBlackCount, setMinBlackCount] = useState('');
+  const [minBlueCount, setMinBlueCount] = useState('');
+  const [minGreenCount, setMinGreenCount] = useState('');
+  const [minRedCount, setMinRedCount] = useState('');
+  const [minGreyCount, setMinGreyCount] = useState('');
+  const [minOrangeCount, setMinOrangeCount] = useState('');
   // ---END USE STATES
 
   const handleLogin = async () => {
@@ -123,6 +129,12 @@ function App() {
       if (minDownhillDistanceKm) query.append('minDownhillDistanceKm', minDownhillDistanceKm);
       if (orderBy) query.append('orderBy', orderBy);
       if (sortOrder) query.append('sortOrder', sortOrder);
+      if (minBlackCount) query.append('minBlackCount', minBlackCount);
+      if (minBlueCount) query.append('minBlueCount', minBlueCount);
+      if (minGreenCount) query.append('minGreenCount', minGreenCount);
+      if (minRedCount) query.append('minRedCount', minRedCount);
+      if (minGreyCount) query.append('minGreyCount', minGreyCount);
+      if (minOrangeCount) query.append('minOrangeCount', minOrangeCount);
       if (resultLimit !== 'ALL') {
         query.append('limit', resultLimit);
       }
@@ -283,6 +295,44 @@ function App() {
             value={minDownhillDistanceKm}
             onChange={(e) => setMinDownhillDistanceKm(e.target.value)}
             className="w-46"
+          />
+        </div>
+        <div className="grid grid-cols-6 gap-4 mb-4">
+          <Input
+            type="number"
+            placeholder="Min Green Runs"
+            value={minGreenCount}
+            onChange={(e) => setMinGreenCount(e.target.value)}
+          />
+          <Input
+            type="number"
+            placeholder="Min Blue Runs"
+            value={minBlueCount}
+            onChange={(e) => setMinBlueCount(e.target.value)}
+          />
+          <Input
+            type="number"
+            placeholder="Min Black Runs"
+            value={minBlackCount}
+            onChange={(e) => setMinBlackCount(e.target.value)}
+          />
+          <Input
+            type="number"
+            placeholder="Min Red Runs"
+            value={minRedCount}
+            onChange={(e) => setMinRedCount(e.target.value)}
+          />
+          <Input
+            type="number"
+            placeholder="Min Grey Runs"
+            value={minGreyCount}
+            onChange={(e) => setMinGreyCount(e.target.value)}
+          />
+          <Input
+            type="number"
+            placeholder="Min Orange Runs"
+            value={minOrangeCount}
+            onChange={(e) => setMinOrangeCount(e.target.value)}
           />
         </div>
         {/* This ternary operator changes columns from 2 to 3 if logged in*/}
