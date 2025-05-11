@@ -11,7 +11,7 @@ module.exports = function handleQuery(err, results, res, options = {}) {
     }
 
     if (Array.isArray(results) && results.length === 0) {
-        return res.status(404).json({ error: notFoundMessage });
+        return res.json([]); // still successful, just empty, 404 caused issues
     }
 
     if (results.affectedRows !== undefined) {
