@@ -355,6 +355,10 @@ function App() {
                           updated.add(skiArea.skiAreaId);
                         }
                         setFavoriteIds(updated);
+
+                        if (favoritesOnly) {
+                          handleFetchSkiAreas(true);
+                        }
                       } catch (err) {
                         console.error('Failed to update favorite:', err);
                         alert('Error updating favorite');
