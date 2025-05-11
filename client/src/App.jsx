@@ -40,6 +40,8 @@ function App() {
   const [minInclinedLength, setMinInclinedLength] = useState('');
   const [minAveragePitch, setMinAveragePitch] = useState('');
   const [runs, setRuns] = useState([]);
+  const [skiAreaNames, setSkiAreaNames] = useState([]);
+const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
   // Handles mode switch
   const [viewMode, setViewMode] = useState('areas'); // 'areas' or 'runs'
   // ---END USE STATES
@@ -74,6 +76,22 @@ function App() {
       setRegion('');
     }
   }, [selectedCountry]);
+
+  useEffect(() => {
+    if (runCountry) {
+      const query = new URLSearchParams({ country: runCountry });
+      if (runRegion) query.append('region', runRegion);
+
+      fetch(`/api/ski-areas/names?${query.toString()}`)
+        .then(res => res.json())
+        .then(data => setSkiAreaNames(data))
+        .catch(err => console.error('Error fetching ski area names', err));
+    } else {
+      setSkiAreaNames([]);
+      setSelectedSkiAreaId('');
+    }
+  }, [runCountry, runRegion]);
+
   // Only countries that exist in the db are used for options here.
   const countries = [
     'Albania', 'Andorra', 'Antarctica', 'Argentina', 'Armenia', 'Australia',
@@ -163,6 +181,7 @@ function App() {
     if (runColor) query.append('color', runColor);
     if (minInclinedLength) query.append('minInclinedLength', minInclinedLength);
     if (minAveragePitch) query.append('minAveragePitch', minAveragePitch);
+    if (selectedSkiAreaId) query.append('skiAreaId', selectedSkiAreaId);
 
     const res = await fetch(`/api/runs?${query.toString()}`);
     const data = await res.json();
@@ -378,7 +397,7 @@ function App() {
                   handleFetchSkiAreas(false);
                 }}
               >
-                Load Ski Areas
+                Search Ski Areas
               </Button>
               <Button
                 className="w-full"
@@ -579,6 +598,25 @@ function App() {
                 </DropdownMenu>
               )}
 
+              {/* Dynamically populated ski area dropdown*/}
+              {skiAreaNames.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                      {skiAreaNames.find(a => a.id === selectedSkiAreaId)?.name || "All Ski Areas"}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onSelect={() => setSelectedSkiAreaId("")}>All Ski Areas</DropdownMenuItem>
+                    {skiAreaNames.map(a => (
+                      <DropdownMenuItem key={a.id} onSelect={() => setSelectedSkiAreaId(a.id)}>
+                        {a.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
               {/* Sort By Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -633,7 +671,31 @@ function App() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <Button
+                className="w-full"
+                onClick={() => {
+                  handleFetchRuns();
+                }}
+              >
+                Search Runs
+              </Button>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => {
+                  setRunCountry('');
+                  setRunRegion('');
+                  setRunDifficulty('');
+                  setRunColor('');
+                  setMinInclinedLength('');
+                  setMinAveragePitch('');
+                  setSelectedSkiAreaId('');
+                }}
+              >
+                Clear Filters
+              </Button>
+            </div>
             {runs.length > 0 ? (
               <div className="space-y-4">
                 {runs.map((run) => (
