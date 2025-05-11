@@ -719,6 +719,39 @@ function App() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+            {/* New row of run-specific filters */}
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <Input
+                type="number"
+                placeholder="Min Avg Pitch (°)"
+                value={minAveragePitch}
+                onChange={(e) => setMinAveragePitch(e.target.value)}
+                className="w-full"
+              />
+              <Input
+                type="number"
+                placeholder="Min Length (m)"
+                value={minInclinedLength}
+                onChange={(e) => setMinInclinedLength(e.target.value)}
+                className="w-full"
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full">
+                    {runColor ? `Color: ${runColor}` : "Select Color"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setRunColor("")}>All Colors</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setRunColor("green")}>Green</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setRunColor("blue")}>Blue</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setRunColor("red")}>Red</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setRunColor("black")}>Black</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setRunColor("grey")}>Grey</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setRunColor("orange")}>Orange</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <Button
                 className="w-full"
