@@ -45,7 +45,7 @@ function App() {
   const [minAveragePitch, setMinAveragePitch] = useState('');
   const [runs, setRuns] = useState([]);
   const [skiAreaNames, setSkiAreaNames] = useState([]);
-  const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
+  const [skiAreaWebsites, setSkiAreaWebsites] = useState({});
   // Separate selected ski area for the runs dropdown
   const [runSelectedSkiAreaId, setRunSelectedSkiAreaId] = useState('');
   // Handles mode switch
@@ -122,7 +122,6 @@ function App() {
       fetchSkiAreaNames();
     } else {
       setSkiAreaNames([]);
-      setSelectedSkiAreaId('');
     }
   }, [runCountry, runRegion]);
 
@@ -236,6 +235,20 @@ function App() {
 
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
+  // Fetch and store ski area websites based on skiAreaId
+  const fetchSkiAreaWebsites = async (skiAreaId) => {
+    // To avoid spamming my api, keep sites in memory
+    if (skiAreaWebsites[skiAreaId]) return;
+
+    try {
+      const res = await fetch(`/api/ski-areas/${skiAreaId}/websites`);
+      const data = await res.json();
+      setSkiAreaWebsites((prev) => ({ ...prev, [skiAreaId]: data }));
+    } catch (error) {
+      console.error(`Error fetching websites for ${skiAreaId}:`, error);
+    }
   };
 
   return (
@@ -491,7 +504,14 @@ function App() {
                 ];
 
                 return (
-                  <Card key={skiArea.skiAreaId} onClick={() => toggleExpand(index)} className="mb-4 p-4 max-w-full md:max-w-5xl mx-auto bg-gray-100 cursor-pointer">
+                  <Card
+                    key={skiArea.skiAreaId}
+                    onClick={() => {
+                      toggleExpand(index);
+                      fetchSkiAreaWebsites(skiArea.skiAreaId);
+                    }}
+                    className="mb-4 p-4 max-w-full md:max-w-5xl mx-auto bg-gray-100 cursor-pointer"
+                  >
                     <div className="grid grid-cols-3 gap-4">
                       <div>
                         <h2 className="text-xl font-bold">{skiArea.primaryName}</h2>
@@ -579,15 +599,31 @@ function App() {
                       ))}
                     </div>
                     {expandedIndex === index && (
-                      <div className="mt-4 text-sm">
-                        <h3 className="font-semibold mb-2">Additional Information</h3>
-                        <p>Min Elevation: {skiArea.minElevationM ?? '—'} m</p>
-                        <p>Max Elevation: {skiArea.maxElevationM ?? '—'} m</p>
-                        <p>Latitude: {skiArea.latitude ?? '—'}</p>
-                        <p>Longitude: {skiArea.longitude ?? '—'}</p>
-                        <p>
-                          Map: <a href={skiArea.openSkiMap} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">View on OpenSkiMap</a>
-                        </p>
+                      <div className="mt-4 text-sm grid grid-cols-2 gap-4">
+                        <div>
+                          <h3 className="font-semibold mb-2">Additional Information</h3>
+                          <p>Min Elevation: {skiArea.minElevationM ?? '—'} m</p>
+                          <p>Max Elevation: {skiArea.maxElevationM ?? '—'} m</p>
+                          <p>Latitude: {skiArea.latitude ?? '—'}</p>
+                          <p>Longitude: {skiArea.longitude ?? '—'}</p>
+                          <p>
+                            Map: <a href={skiArea.openSkiMap} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">View on OpenSkiMap</a>
+                          </p>
+                        </div>
+                        {skiAreaWebsites[skiArea.skiAreaId]?.length > 0 && (
+                          <div>
+                            <h3 className="font-semibold">Websites</h3>
+                            <ul className="list-disc list-inside">
+                              {skiAreaWebsites[skiArea.skiAreaId].map((w, i) => (
+                                <li key={i}>
+                                  <a href={w.websiteUrl} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">
+                                    {w.websiteUrl}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     )}
                   </Card>
