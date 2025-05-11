@@ -81,8 +81,19 @@ function App() {
     { label: 'Ascending', value: 'ASC' },
   ];
   
-  const handleFetchSkiAreas = async () => {
+  const handleFetchSkiAreas = async (forceFavoritesOnly = favoritesOnly) => {
     try {
+      // For now, if showing favorites, filtering doesn't apply.
+      // I think I need additional backend structure to really handle
+      // filtering + favorites at the same time in an efficient structure.
+      if (forceFavoritesOnly && userId) {
+        const favRes = await fetch(`/api/favorites/${userId}`);
+        const favoriteData = await favRes.json();
+        setSkiAreas(favoriteData);
+        return;
+      }
+
+      // If favorites isn't toggled, build an api call from filters
       const query = new URLSearchParams();
       if (selectedCountry) query.append('country', selectedCountry);
       if (minVertical) query.append('minVertical', minVertical);
@@ -98,16 +109,6 @@ function App() {
 
       const res = await fetch(`/api/ski-areas?${query.toString()}`);
       const data = await res.json();
-
-      // If favorites only is toggled, get all favorites and only show matching ids with
-      // filtered results
-      if (favoritesOnly && userId) {
-        const favRes = await fetch(`/api/favorites/${userId}`);
-        const favoriteData = await favRes.json();
-        const favoriteIDs = new Set(favoriteData.map(fav => fav.SkiAreaID || fav.skiAreaId));
-
-        data = data.filter(area => favoriteIDs.has(area.skiAreaId));
-      }
       setSkiAreas(data);
     } catch (error) {
       console.error('Error fetching ski areas:', error);
@@ -215,15 +216,7 @@ function App() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <Button
-            variant={favoritesOnly ? "default" : "outline"}
-            onClick={() => setFavoritesOnly(prev => !prev)}
-          >
-            {favoritesOnly ? "✅ Showing Favorites Only" : "Show Favorites Only"}
-          </Button>
         </div>
-        
 
         <div className="flex flex-wrap justify-between gap-2 mb-4">
           {/* Inputs row*/}
@@ -256,7 +249,8 @@ function App() {
             className="w-46"
           />
         </div>
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        {/* This ternary operator changes columns from 2 to 3 if logged in*/}
+        <div className={`grid ${userId ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-4`}>
           <Button
             className="w-full"
             onClick={handleFetchSkiAreas}
@@ -278,6 +272,18 @@ function App() {
           >
             Clear Filters
           </Button>
+          {/* Only show the "show favorites" button if "logged in"*/}
+          {userId && (
+            <Button
+              variant={favoritesOnly ? "default" : "outline"}
+              onClick={async () => {
+                setFavoritesOnly(true);
+                handleFetchSkiAreas(true);
+              }}
+            >
+              Show Favorites
+            </Button>
+          )}
         </div>
 
       {skiAreas.map((skiArea, index) => {
