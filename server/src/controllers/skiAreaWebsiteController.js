@@ -2,7 +2,7 @@ const pool = require('../config/db');
 const handleQuery = require('../utils/handleQuery');
 
 exports.getWebsitesBySkiAreaId = (req, res) => {
-    const { id } = req.params;
+    const skiAreaId = req.params.id;
 
     const query = `
         SELECT WebsiteURL as websiteUrl
@@ -10,7 +10,7 @@ exports.getWebsitesBySkiAreaId = (req, res) => {
         WHERE SkiAreaID = ?
     `;
 
-    pool.query(query, [id], (err, results) => {
+    pool.query(query, [skiAreaId], (err, results) => {
         handleQuery(err, results, res, {
             errorMessage: 'Failed to get websites',
             notFoundMessage: 'Websites not found for this ski area'
