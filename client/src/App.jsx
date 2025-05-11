@@ -738,7 +738,7 @@ function App() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="w-full">
-                    {runColor ? `Color: ${runColor}` : "Select Color"}
+                    {runColor ? `Color: ${runColor.charAt(0).toUpperCase() + runColor.slice(1)}` : "Select Color"}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
