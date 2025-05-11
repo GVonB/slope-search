@@ -1,4 +1,4 @@
-# Slope Search
+# Slope Search (README in Progress!)
 A web application allowing users to search, filter, and favorite ski resorts around the world. Using data from openskimap.org.
 
 ## Local Installation Instructions
