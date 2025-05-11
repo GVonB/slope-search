@@ -44,6 +44,8 @@ function App() {
   const [runs, setRuns] = useState([]);
   const [skiAreaNames, setSkiAreaNames] = useState([]);
   const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
+  // Separate selected ski area for the runs dropdown
+  const [runSelectedSkiAreaId, setRunSelectedSkiAreaId] = useState('');
   // Handles mode switch
   const [viewMode, setViewMode] = useState('areas'); // 'areas' or 'runs'
   // ---END USE STATES
@@ -211,7 +213,7 @@ function App() {
     if (runColor) query.append('color', runColor);
     if (minInclinedLength) query.append('minInclinedLength', minInclinedLength);
     if (minAveragePitch) query.append('minAveragePitch', minAveragePitch);
-    if (selectedSkiAreaId) query.append('skiAreaId', selectedSkiAreaId);
+    if (runSelectedSkiAreaId) query.append('skiAreaId', runSelectedSkiAreaId);
 
     const res = await fetch(`/api/runs?${query.toString()}`);
     const data = await res.json();
@@ -633,13 +635,13 @@ function App() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">
-                      {skiAreaNames.find(a => a.id === selectedSkiAreaId)?.name || "All Ski Areas"}
+                      {skiAreaNames.find(a => a.id === runSelectedSkiAreaId)?.name || "All Ski Areas"}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onSelect={() => setSelectedSkiAreaId("")}>All Ski Areas</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setRunSelectedSkiAreaId("")}>All Ski Areas</DropdownMenuItem>
                     {skiAreaNames.map(a => (
-                      <DropdownMenuItem key={a.id} onSelect={() => setSelectedSkiAreaId(a.id)}>
+                      <DropdownMenuItem key={a.id} onSelect={() => setRunSelectedSkiAreaId(a.id)}>
                         {a.name}
                       </DropdownMenuItem>
                     ))}
