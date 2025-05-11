@@ -13,4 +13,7 @@ router.get('/:id/names', skiAreaNameController.getNamesBySkiAreaId);
 // Websites for a ski area based on id
 router.get('/:id/websites', skiAreaWebsiteController.getWebsitesBySkiAreaId);
 
+// Filtered names with ids for dropdown menu to select from
+router.get('/names', skiAreaNameController.getAllPrimaryNamesWithId);
+
 module.exports = router;
