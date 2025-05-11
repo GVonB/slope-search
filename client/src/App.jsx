@@ -697,28 +697,69 @@ const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
               </Button>
             </div>
             {runs.length > 0 ? (
-              <div className="space-y-4">
-                {runs.map((run) => (
-                  <Card key={run.runId} className="p-4 bg-white shadow">
-                    <h3 className="text-xl font-semibold mb-2">{run.primaryRunName || 'Unnamed Run'}</h3>
-                    <p><strong>Ski Area:</strong> {run.skiAreaName || '—'}</p>
-                    <p><strong>Color:</strong> {run.color}</p>
-                    <p><strong>Difficulty:</strong> {run.difficulty}</p>
-                    <p><strong>Inclined Length:</strong> {run.inclinedLengthM ?? '—'} m</p>
-                    <p><strong>Avg Pitch:</strong> {(run.averagePitch * 100).toFixed(1)}%</p>
-                    <p><strong>Max Pitch:</strong> {(run.maxPitch * 100).toFixed(1)}%</p>
-                    <p><strong>Lit:</strong> {run.lit ? 'Yes' : 'No'}</p>
-                    <a
-                      href={run.openSkiMap}
-                      className="text-blue-500 underline"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View on OpenSkiMap
-                    </a>
+              runs.map((run, index) => {
+                const avgPitchDeg = run.averagePitch != null
+                  ? (Math.atan(run.averagePitch) * 180 / Math.PI).toFixed(1)
+                  : null;
+                const maxPitchDeg = run.maxPitch != null
+                  ? (Math.atan(run.maxPitch) * 180 / Math.PI).toFixed(1)
+                  : null;
+
+                // TODO: Reuse colors between areas and runs
+                const colorMap = {
+                  green: 'bg-green-500',
+                  blue: 'bg-blue-500',
+                  red: 'bg-red-500',
+                  black: 'bg-black',
+                  grey: 'bg-gray-500',
+                  orange: 'bg-orange-500',
+                };
+                  
+                return (
+                  <Card
+                    key={run.runId}
+                    onClick={() => toggleExpand(index)}
+                    className="mb-4 p-4 max-w-full md:max-w-5xl mx-auto bg-gray-100 cursor-pointer"
+                  >
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <h2 className="text-xl font-bold">{run.primaryRunName || 'Unnamed Run'}</h2>
+                        <p className="text-sm text-gray-600">{run.country}, {run.region}</p>
+                        <p className="text-sm text-gray-600">{run.skiAreaName || '—'}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="flex items-center justify-center">
+                          {run.color && (
+                            <span
+                              className={`inline-block w-3 h-3 rounded-full mr-2 ${colorMap[run.color] || 'bg-gray-400'}`}
+                            ></span>
+                          )}
+                          Color: {run.color ? run.color.charAt(0).toUpperCase() + run.color.slice(1) : '—'}
+                        </p>
+                        <p>Difficulty: {run.difficulty ? run.difficulty.charAt(0).toUpperCase() + run.difficulty.slice(1) : '—'}</p>
+                        <p>Lit: {run.lit ? 'Yes' : 'No'}</p>
+                      </div>
+                      <div className="text-right">
+                        <p>Length: {run.inclinedLengthM != null ? Math.round(run.inclinedLengthM) : '—'} m</p>
+                        <p>Avg Pitch: {avgPitchDeg ?? '—'}%</p>
+                        <p>Max Pitch: {maxPitchDeg ?? '—'}%</p>
+                      </div>
+                    </div>
+
+                    {expandedIndex === index && (
+                      <div className="mt-4 text-sm">
+                        <h3 className="font-semibold mb-2">Additional Information</h3>
+                        <p>Min Elevation: {run.minElevationM ?? '—'} m</p>
+                        <p>Max Elevation: {run.maxElevationM ?? '—'} m</p>
+                        <p>Convention: {run.difficultyConvention ?? '—'}</p>
+                        <p>
+                          Map: <a href={run.openSkiMap} className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">View on OpenSkiMap</a>
+                        </p>
+                      </div>
+                    )}
                   </Card>
-                ))}
-              </div>
+                );
+              })
             ) : (
               <p className="text-center text-gray-500 mt-4">No runs loaded. Adjust filters and try again.</p>
             )}
