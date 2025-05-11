@@ -3,7 +3,7 @@ const handleQuery = require('../utils/handleQuery');
 
 // TODO: Redis caching for this query?
 exports.getRuns = (req, res) => {
-    const { country, region, difficulty, color, minInclinedLength, minAveragePitch, orderBy, sortOrder } = req.query;
+    const { country, region, difficulty, color, minInclinedLength, minAveragePitch, orderBy, sortOrder, skiAreaId } = req.query;
 
     // For a useful query we need the run name, and the
     // name of the ski area the run is at. However,
@@ -66,6 +66,10 @@ exports.getRuns = (req, res) => {
     if (minAveragePitch) {
         baseQuery += ' AND r.AveragePitch >= ?';
         params.push(Number(minAveragePitch));
+    }
+    if (skiAreaId) {
+        baseQuery += ' AND sa.SkiAreaID = ?';
+        params.push(skiAreaId);
     }
 
     baseQuery += ' GROUP BY r.RunID';
