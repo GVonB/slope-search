@@ -28,7 +28,9 @@ function App() {
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   // Handling favorites list
   const [favoriteIds, setFavoriteIds] = useState(new Set());
+  // TODO: rename a lot of the ski are specific states to show that
   const [resultLimit, setResultLimit] = useState('100');
+  const [runResultLimit, setRunResultLimit] = useState('100');
   const [minBlackCount, setMinBlackCount] = useState('');
   const [minBlueCount, setMinBlueCount] = useState('');
   const [minGreenCount, setMinGreenCount] = useState('');
@@ -141,13 +143,20 @@ function App() {
     'United States', 'Uzbekistan'
   ];
 
-  const orderByOptions = [
+  const skiAreaOrderByOptions = [
     { label: 'Vertical', value: 'VerticalM' },
     { label: 'Max Average Pitch', value: 'maxAverageRunPitch' },
     { label: 'Run Count', value: 'runCount' },
     { label: 'Downhill Distance', value: 'DownhillDistanceKm' },
     { label: 'Lift Count', value: 'LiftCount' },
     { label: 'Max Elevation', value: 'MaxElevationM' },
+  ];
+
+  const runOrderByOptions = [
+    { label: 'Inclined Length', value: 'InclinedLengthM' },
+    { label: 'Average Pitch', value: 'AveragePitch' },
+    { label: 'Max Pitch', value: 'MaxPitch' },
+    { label: 'Descent', value: 'DescentM' },
   ];
 
   const sortOptions = [
@@ -214,6 +223,9 @@ function App() {
     if (minInclinedLength) query.append('minInclinedLength', minInclinedLength);
     if (minAveragePitch) query.append('minAveragePitch', minAveragePitch);
     if (runSelectedSkiAreaId) query.append('skiAreaId', runSelectedSkiAreaId);
+    if (runResultLimit !== 'ALL') {
+      query.append('limit', runResultLimit);
+    }
 
     const res = await fetch(`/api/runs?${query.toString()}`);
     const data = await res.json();
@@ -301,11 +313,11 @@ function App() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    {orderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
+                    {skiAreaOrderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {orderByOptions.map((option) => (
+                  {skiAreaOrderByOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.value}
                       onSelect={() => setOrderBy(option.value)}
@@ -653,11 +665,11 @@ function App() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    {orderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
+                    {runOrderByOptions.find(o => o.value === orderBy)?.label || "Sort By"}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {orderByOptions.map((option) => (
+                  {runOrderByOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.value}
                       onSelect={() => setOrderBy(option.value)}
@@ -688,14 +700,14 @@ function App() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    {limitOptions.find(o => o.value === resultLimit)?.label || "Result Limit"}
+                    {limitOptions.find(o => o.value === runResultLimit)?.label || "Result Limit"}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   {limitOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.value}
-                      onSelect={() => setResultLimit(option.value)}
+                      onSelect={() => setRunResultLimit(option.value)}
                     >
                       {option.label}
                     </DropdownMenuItem>
