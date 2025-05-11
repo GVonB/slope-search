@@ -6,6 +6,8 @@ services:
       - "4173:4173"
     depends_on:
       - server
+    environment:
+      DOCKER: "true"
 
   server:
     build:
@@ -20,7 +22,6 @@ services:
     restart: always
     command: --local-infile=1
     environment:
-      DOCKER: "true"
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
