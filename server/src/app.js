@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const skiAreaRoutes = require('./routes/skiAreaRoutes');
 const runRoutes = require('./routes/runRoutes');
 const favoritesRoutes = require('./routes/favoritesRoutes');
@@ -7,6 +8,17 @@ const regionRoutes = require('./routes/regionRoutes');
 require('dotenv').config();
 
 const app = express();
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'https://slope-search.gvonb.dev'
+];
+
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true, // optional: if you're using cookies/auth
+}));
+
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
