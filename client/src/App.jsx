@@ -54,7 +54,7 @@ function App() {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch('https://api.slope-search.gvonb.dev/api/users', {
+      const res = await fetch('https://slope-api.gvonb.dev/api/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username }),
@@ -63,7 +63,7 @@ function App() {
         setUserId(data.userId);
 
         // Fetch favorites immediately for accurate button states
-        const favRes = await fetch(`https://api.slope-search.gvonb.dev/api/favorites/${data.userId}`);
+        const favRes = await fetch(`https://slope-api.gvonb.dev/api/favorites/${data.userId}`);
         const favData = await favRes.json();
         setFavoriteIds(new Set(favData.map(f => f.skiAreaId)));
     } catch (err) {
@@ -73,7 +73,7 @@ function App() {
   // Use effect for getting regions based on the selected country (ski areas)
   useEffect(() => {
     if (selectedCountry) {
-      fetch(`https://api.slope-search.gvonb.dev/api/regions?country=${encodeURIComponent(selectedCountry)}`)
+      fetch(`https://slope-api.gvonb.dev/api/regions?country=${encodeURIComponent(selectedCountry)}`)
         .then(res => res.json())
         .then(data => setSkiAreaRegions(data))
         .catch(err => console.error("Error fetching regions", err));
@@ -88,7 +88,7 @@ function App() {
     if (runCountry) {
       const fetchRegions = async () => {
         try {
-          const res = await fetch(`https://api.slope-search.gvonb.dev/api/regions?country=${encodeURIComponent(runCountry)}`);
+          const res = await fetch(`https://slope-api.gvonb.dev/api/regions?country=${encodeURIComponent(runCountry)}`);
           const data = await res.json();
           setRunRegions(data);
         } catch (err) {
@@ -109,7 +109,7 @@ function App() {
         if (runCountry) query.append('country', runCountry);
         if (runRegion) query.append('region', runRegion);
 
-        const res = await fetch(`https://api.slope-search.gvonb.dev/api/ski-areas/names?${query.toString()}`);
+        const res = await fetch(`https://slope-api.gvonb.dev/api/ski-areas/names?${query.toString()}`);
         const data = await res.json();
         setSkiAreaNames(data);
       } catch (err) {
@@ -177,7 +177,7 @@ function App() {
       // I think I need additional backend structure to really handle
       // filtering + favorites at the same time in an efficient structure.
       if (forceFavoritesOnly && userId) {
-        const favRes = await fetch(`https://api.slope-search.gvonb.dev/api/favorites/${userId}`);
+        const favRes = await fetch(`https://slope-api.gvonb.dev/api/favorites/${userId}`);
         const favoriteData = await favRes.json();
         setSkiAreas(favoriteData);
         return;
@@ -205,7 +205,7 @@ function App() {
       if (resultLimit !== 'ALL') {
         query.append('limit', resultLimit);
       }
-      const res = await fetch(`https://api.slope-search.gvonb.dev/api/ski-areas?${query.toString()}`);
+      const res = await fetch(`https://slope-api.gvonb.dev/api/ski-areas?${query.toString()}`);
       const data = await res.json();
       setSkiAreas(data);
     } catch (error) {
@@ -228,7 +228,7 @@ function App() {
       query.append('limit', runResultLimit);
     }
 
-    const res = await fetch(`https://api.slope-search.gvonb.dev/api/runs?${query.toString()}`);
+    const res = await fetch(`https://slope-api.gvonb.dev/api/runs?${query.toString()}`);
     const data = await res.json();
     setRuns(data);
   };
@@ -243,7 +243,7 @@ function App() {
     if (skiAreaWebsites[skiAreaId]) return;
 
     try {
-      const res = await fetch(`https://api.slope-search.gvonb.dev/api/ski-areas/${skiAreaId}/websites`);
+      const res = await fetch(`https://slope-api.gvonb.dev/api/ski-areas/${skiAreaId}/websites`);
       const data = await res.json();
       setSkiAreaWebsites((prev) => ({ ...prev, [skiAreaId]: data }));
     } catch (error) {
@@ -536,8 +536,8 @@ function App() {
 
                               try {
                                 const endpoint = isFavorited
-                                  ? `https://api.slope-search.gvonb.dev/api/favorites/remove`
-                                  : `https://api.slope-search.gvonb.dev/api/favorites/add`;
+                                  ? `https://slope-api.gvonb.dev/api/favorites/remove`
+                                  : `https://slope-api.gvonb.dev/api/favorites/add`;
 
                                 await fetch(endpoint, {
                                   method: isFavorited ? 'DELETE' : 'POST',

@@ -14,7 +14,7 @@ export default defineConfig({
     }
   },
   preview: {
-    allowedHosts: ['localhost', 'slope-search.gvonb.dev', 'server']
+    allowedHosts: ['localhost', 'slope-search.gvonb.dev', 'slope-api.gvonb.dev', 'server']
   },
   resolve: {
     alias: {
