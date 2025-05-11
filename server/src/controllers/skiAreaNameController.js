@@ -45,7 +45,7 @@ exports.getAllPrimaryNamesWithId = (req, res) => {
         ORDER BY name
     `;
 
-    pool.query(query, params, (err, results) => {
+    pool.query(baseQuery, params, (err, results) => {
         handleQuery(err, results, res, {
             errorMessage: 'Failed to get filtered ski area names',
             notFoundMessage: 'No ski areas found for these filters'
