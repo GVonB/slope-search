@@ -472,6 +472,12 @@ function App() {
                   setMinMaxAveragePitch('');
                   setMinRunCount('');
                   setMinDownhillDistanceKm('');
+                  setMinGreenCount('');
+                  setMinBlueCount('');
+                  setMinBlackCount('');
+                  setMinRedCount('');
+                  setMinGreyCount('');
+                  setMinOrangeCount('');
                 }}
               >
                 Clear Filters
