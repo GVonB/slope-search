@@ -310,37 +310,37 @@ function App() {
         <div className="grid grid-cols-6 gap-4 mb-4">
           <Input
             type="number"
-            placeholder="Min Green Runs"
+            placeholder="Min Greens"
             value={minGreenCount}
             onChange={(e) => setMinGreenCount(e.target.value)}
           />
           <Input
             type="number"
-            placeholder="Min Blue Runs"
+            placeholder="Min Blues"
             value={minBlueCount}
             onChange={(e) => setMinBlueCount(e.target.value)}
           />
           <Input
             type="number"
-            placeholder="Min Black Runs"
+            placeholder="Min Blacks"
             value={minBlackCount}
             onChange={(e) => setMinBlackCount(e.target.value)}
           />
           <Input
             type="number"
-            placeholder="Min Red Runs"
+            placeholder="Min Reds"
             value={minRedCount}
             onChange={(e) => setMinRedCount(e.target.value)}
           />
           <Input
             type="number"
-            placeholder="Min Grey Runs"
+            placeholder="Min Greys"
             value={minGreyCount}
             onChange={(e) => setMinGreyCount(e.target.value)}
           />
           <Input
             type="number"
-            placeholder="Min Orange Runs"
+            placeholder="Min Oranges"
             value={minOrangeCount}
             onChange={(e) => setMinOrangeCount(e.target.value)}
           />
