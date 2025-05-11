@@ -223,6 +223,8 @@ function App() {
     if (minInclinedLength) query.append('minInclinedLength', minInclinedLength);
     if (minAveragePitch) query.append('minAveragePitch', minAveragePitch);
     if (runSelectedSkiAreaId) query.append('skiAreaId', runSelectedSkiAreaId);
+    if (orderBy) query.append('orderBy', orderBy);
+    if (sortOrder) query.append('sortOrder', sortOrder);
     if (runResultLimit !== 'ALL') {
       query.append('limit', runResultLimit);
     }
@@ -672,7 +674,9 @@ function App() {
                   {runOrderByOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.value}
-                      onSelect={() => setOrderBy(option.value)}
+                      onSelect={() => {
+                        setOrderBy(option.value);
+                      }}
                     >
                       {option.label}
                     </DropdownMenuItem>
@@ -734,7 +738,10 @@ function App() {
                   setRunColor('');
                   setMinInclinedLength('');
                   setMinAveragePitch('');
-                  setSelectedSkiAreaId('');
+                  setRunSelectedSkiAreaId('');
+                  setOrderBy('');
+                  setSortOrder('DESC');
+                  setRunResultLimit('100');
                 }}
               >
                 Clear Filters
