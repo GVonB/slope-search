@@ -13,4 +13,5 @@ server/node_modules
 .DS_Store
 
 # Ignore env configuration
+.env
 /server/.env
