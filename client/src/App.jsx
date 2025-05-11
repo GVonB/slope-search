@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 
 function App() {
+  // ---USE STATES---
   const [skiAreas, setSkiAreas] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState('');
@@ -23,17 +24,25 @@ function App() {
   // List of regions to populate dropdown
   const [regions, setRegions] = useState([]);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
+  // Handling favorites list
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
 
+  // ---END USE STATES
 
   const handleLogin = async () => {
     try {
       const res = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username }),
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username }),
         });
         const data = await res.json();
         setUserId(data.userId);
+
+        // Fetch favorites immediately for accurate button states
+        const favRes = await fetch(`api/favorites/${data.userId}`);
+        const favData = await favRes.json();
+        setFavoriteIds(new Set(favData.map(f => f.skiAreaId)));
     } catch (err) {
       console.error('Login error:', err);
     }
@@ -277,11 +286,12 @@ function App() {
             <Button
               variant={favoritesOnly ? "default" : "outline"}
               onClick={async () => {
-                setFavoritesOnly(true);
-                handleFetchSkiAreas(true);
+                const newValue = !favoritesOnly;
+                setFavoritesOnly(newValue);
+                handleFetchSkiAreas(newValue);
               }}
             >
-              Show Favorites
+              {favoritesOnly ? "Back to Filters" : "Show Favorites"}
             </Button>
           )}
         </div>
