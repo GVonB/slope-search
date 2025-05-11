@@ -21,8 +21,10 @@ function App() {
   const [username, setUsername] = useState('');
   // Single selected region in dropdown
   const [region, setRegion] = useState('');
-  // List of regions to populate dropdown
-  const [regions, setRegions] = useState([]);
+  // List of regions to populate dropdown for ski areas
+  const [skiAreaRegions, setSkiAreaRegions] = useState([]);
+  // List of regions to populate dropdown for runs
+  const [runRegions, setRunRegions] = useState([]);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   // Handling favorites list
   const [favoriteIds, setFavoriteIds] = useState(new Set());
@@ -41,7 +43,7 @@ function App() {
   const [minAveragePitch, setMinAveragePitch] = useState('');
   const [runs, setRuns] = useState([]);
   const [skiAreaNames, setSkiAreaNames] = useState([]);
-const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
+  const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
   // Handles mode switch
   const [viewMode, setViewMode] = useState('areas'); // 'areas' or 'runs'
   // ---END USE STATES
@@ -64,28 +66,56 @@ const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
       console.error('Login error:', err);
     }
   };
-  // Use effect for getting regions based on the selected country
+  // Use effect for getting regions based on the selected country (ski areas)
   useEffect(() => {
     if (selectedCountry) {
       fetch(`/api/regions?country=${encodeURIComponent(selectedCountry)}`)
         .then(res => res.json())
-        .then(data => setRegions(data))
+        .then(data => setSkiAreaRegions(data))
         .catch(err => console.error("Error fetching regions", err));
     } else {
-      setRegions([]);
+      setSkiAreaRegions([]);
       setRegion('');
     }
   }, [selectedCountry]);
 
+  // Use effect for getting regions based on the selected run country (runs)
   useEffect(() => {
     if (runCountry) {
-      const query = new URLSearchParams({ country: runCountry });
-      if (runRegion) query.append('region', runRegion);
+      const fetchRegions = async () => {
+        try {
+          const res = await fetch(`/api/regions?country=${encodeURIComponent(runCountry)}`);
+          const data = await res.json();
+          setRunRegions(data);
+        } catch (err) {
+          console.error("Error fetching regions", err);
+        }
+      };
+      fetchRegions();
+    } else {
+      setRunRegions([]);
+      setRunRegion('');
+    }
+  }, [runCountry]);
 
-      fetch(`/api/ski-areas/names?${query.toString()}`)
-        .then(res => res.json())
-        .then(data => setSkiAreaNames(data))
-        .catch(err => console.error('Error fetching ski area names', err));
+  useEffect(() => {
+    const fetchSkiAreaNames = async () => {
+      try {
+        const query = new URLSearchParams();
+        if (runCountry) query.append('country', runCountry);
+        if (runRegion) query.append('region', runRegion);
+
+        const res = await fetch(`/api/ski-areas/names?${query.toString()}`);
+        const data = await res.json();
+        setSkiAreaNames(data);
+      } catch (err) {
+        console.error('Error fetching ski area names', err);
+        setSkiAreaNames([]);
+      }
+    };
+
+    if (runCountry) {
+      fetchSkiAreaNames();
     } else {
       setSkiAreaNames([]);
       setSelectedSkiAreaId('');
@@ -247,7 +277,7 @@ const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
               </DropdownMenu>
 
               {/* Region Dropdown */}
-              {regions.length > 0 && (
+              {skiAreaRegions.length > 0 && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">
@@ -256,7 +286,7 @@ const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onSelect={() => setRegion("")}>All Regions</DropdownMenuItem>
-                    {regions.map(r => (
+                    {skiAreaRegions.map(r => (
                       <DropdownMenuItem key={r} onSelect={() => setRegion(r)}>
                         {r}
                       </DropdownMenuItem>
@@ -561,17 +591,17 @@ const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    {selectedCountry || "All Countries"}
+                    {runCountry || "All Countries"}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => setSelectedCountry("")}>
+                  <DropdownMenuItem onSelect={() => setRunCountry("")}>
                     All Countries
                   </DropdownMenuItem>
                   {countries.map((country) => (
                     <DropdownMenuItem
                       key={country}
-                      onSelect={() => setSelectedCountry(country)}
+                      onSelect={() => setRunCountry(country)}
                     >
                       {country}
                     </DropdownMenuItem>
@@ -580,17 +610,17 @@ const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
               </DropdownMenu>
 
               {/* Region Dropdown */}
-              {regions.length > 0 && (
+              {runCountry && runRegions.length > 0 && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">
-                      {region || "All Regions"}
+                      {runRegion || "All Regions"}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onSelect={() => setRegion("")}>All Regions</DropdownMenuItem>
-                    {regions.map(r => (
-                      <DropdownMenuItem key={r} onSelect={() => setRegion(r)}>
+                    <DropdownMenuItem onSelect={() => setRunRegion("")}>All Regions</DropdownMenuItem>
+                    {runRegions.map(r => (
+                      <DropdownMenuItem key={r} onSelect={() => setRunRegion(r)}>
                         {r}
                       </DropdownMenuItem>
                     ))}
@@ -746,8 +776,19 @@ const [selectedSkiAreaId, setSelectedSkiAreaId] = useState('');
                       </div>
                     </div>
 
+                    {/* Full-width single color bar */}
+                    <div className="mt-2 h-4 rounded w-full overflow-hidden bg-gray-300">
+                      {run.color && (
+                        <div
+                          className={`${colorMap[run.color] || 'bg-gray-400'} h-full`}
+                          style={{ width: '100%' }}
+                          title={run.color}
+                        />
+                      )}
+                    </div>
+
                     {expandedIndex === index && (
-                      <div className="mt-4 text-sm">
+                      <div className="mt-2 text-sm">
                         <h3 className="font-semibold mb-2">Additional Information</h3>
                         <p>Min Elevation: {run.minElevationM ?? '—'} m</p>
                         <p>Max Elevation: {run.maxElevationM ?? '—'} m</p>
