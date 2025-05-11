@@ -33,6 +33,8 @@ function App() {
   const [minRedCount, setMinRedCount] = useState('');
   const [minGreyCount, setMinGreyCount] = useState('');
   const [minOrangeCount, setMinOrangeCount] = useState('');
+  // Handles mode switch
+  const [viewMode, setViewMode] = useState('areas'); // 'areas' or 'runs'
   // ---END USE STATES
 
   const handleLogin = async () => {
@@ -169,7 +171,15 @@ function App() {
           </div>
         )}
       </div>
-      <h1 className="text-3xl font-bold mb-6 text-center">Slope Search 🏔️</h1>
+      <h1 className="text-6xl font-bold mb-6 text-center">Slope Search 🏔️</h1>
+      <div className="mb-8 flex gap-2 justify-center">
+        <Button className="w-46" variant={viewMode === 'areas' ? "default" : "outline"} onClick={() => setViewMode('areas')}>
+          Ski Areas
+        </Button>
+        <Button className="w-46" variant={viewMode === 'runs' ? "default" : "outline"} onClick={() => setViewMode('runs')}>
+          Ski Runs
+        </Button>
+        </div>
         <div className="flex flex-wrap mb-4 gap-2">
           {/* Country Dropdown */}
           <DropdownMenu>
