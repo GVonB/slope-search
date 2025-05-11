@@ -13,6 +13,9 @@ export default defineConfig({
       '/api': isDocker ? 'http://server:3000' : 'http://localhost:3000'
     }
   },
+  preview: {
+    allowedHosts: ['localhost', 'slope-search.gvonb.dev', 'server']
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
