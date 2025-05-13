@@ -1,6 +1,8 @@
 # Slope Search
 A web application allowing users to search, filter, and favorite ski resorts around the world. Using data from openskimap.org.
 
+Visit the live deployment at [slope-search.gvonb.dev](https://slope-search.gvonb.dev/)
+
 ## Prerequisites
 
 Before proceeding, you will need to have the following installed:
