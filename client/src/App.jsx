@@ -870,8 +870,8 @@ function App() {
                       </div>
                       <div className="text-right">
                         <p>Length: {run.inclinedLengthM != null ? Math.round(run.inclinedLengthM) : '—'} m</p>
-                        <p>Avg Pitch: {avgPitchDeg ?? '—'}%</p>
-                        <p>Max Pitch: {maxPitchDeg ?? '—'}%</p>
+                        <p>Avg Pitch: {avgPitchDeg ?? '—'}°</p>
+                        <p>Max Pitch: {maxPitchDeg ?? '—'}°</p>
                       </div>
                     </div>
 
