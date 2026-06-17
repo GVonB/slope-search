@@ -2,32 +2,40 @@ services:
   client:
     build:
       context: ./client
+      args:
+        # Browser runs on the host, so it reaches the server on localhost:3000.
+        VITE_API_URL: "http://localhost:3000"
     ports:
       - "4173:4173"
     depends_on:
       - server
-    environment:
-      DOCKER: "true"
 
   server:
     build:
       context: ./server
     ports:
       - "3000:3000"
+    # Self-heal if the DB isn't reachable in time on a cold start (Railway does this by default).
+    restart: on-failure
     depends_on:
       - mysql
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASS: ${MYSQL_ROOT_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      PORT: 3000
+      CLIENT_ORIGIN: "http://localhost:4173"
 
   mysql:
     image: mysql:8
     restart: always
-    command: --local-infile=1
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3307:3306"
     volumes:
-      - ./notebook/data:/data
       - mysql-data:/var/lib/mysql
 
 volumes:

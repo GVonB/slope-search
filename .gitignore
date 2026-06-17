@@ -3,6 +3,7 @@
 
 # Ignore Python virtual environment
 /notebook/venv
+/.venv
 
 # Ignore Node dependencies
 /node_modules

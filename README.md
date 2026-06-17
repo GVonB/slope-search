@@ -3,124 +3,95 @@ A web application allowing users to search, filter, and favorite ski resorts aro
 
 Visit the live deployment at [slope-search.gvonb.dev](https://slope-search.gvonb.dev/)
 
-## Prerequisites
+## Architecture
 
-Before proceeding, you will need to have the following installed:
-- [Python (Any Version Not EOL)](https://www.python.org/)
-- [Node.js 18+](https://nodejs.org/)
-- Either:
-    - [Docker](https://www.docker.com/) (Recommended)
-    - OR a local MySQL setup such as [MySQL Workbench](https://www.mysql.com/products/workbench/)
+Three pieces:
 
-## Local Installation Instructions
+- **client/** — React + Vite frontend (served with `vite preview`)
+- **server/** — Express API (`/api/...`) backed by MySQL
+- **MySQL** — schema + data are created automatically on the server's first boot
 
-Local installation is best with **Docker** or you can also run the frontend and backend servers separately using Node.
+The cleaned dataset ships in the repo (`server/seed/*.ndjson.gz`). On startup the
+server creates the tables and bulk-loads the seed **only if the database is empty**, so
+there is no manual SQL step and restarts don't re-import. No `LOAD DATA INFILE`, no
+notebook required to run the app.
 
----
+## Run locally (Docker)
 
-### 1. Download and Prepare Data Directory
+Prerequisite: [Docker](https://www.docker.com/).
 
-To save size on the repository and support data updates, no data is stored in the repo.
+1. Create a root `.env`:
+   ```bash
+   MYSQL_ROOT_PASSWORD=password
+   MYSQL_DATABASE=slope_search
+   ```
+2. Start everything:
+   ```bash
+   docker compose up --build
+   ```
+   The server waits for MySQL, seeds it on first boot (watch the logs for
+   `Seed: loading data...` → `Seed: done.`), then starts serving.
+3. Open [http://localhost:4173](http://localhost:4173).
 
-- Download these two datasets from the about page on [https://www.openskimap.org](https://openskimap.org/?about#)
-    - `ski_areas.csv`
-    - `runs.csv`
-- Create a new folder at: `notebook/data/`
-- Move both `.csv` files into `notebook/data/`
+To re-seed from scratch, drop the volume first: `docker compose down -v`.
 
----
+## Run locally (without Docker)
 
-### 2. Clean and Process Data
-- (Optional) Create a Python virtual environment:
-  ```bash
-  cd notebook
-  python3 -m venv venv
-  source venv/bin/activate
-  ```
-- Install Python requirements:
-  ```bash
-  pip install -r requirements.txt
-  ```
-- Open `notebook/clean_data.ipynb` and run all cells to generate cleaned CSVs.
-- Cleaned data will be saved automatically into `notebook/data/`.
+You need a running MySQL instance and an empty database matching `server/.env`.
 
----
-
-### 3. Environment Setup
-
-Create .env files:
-- In the root directory (.env):
-  ```bash
-  MYSQL_ROOT_PASSWORD=password
-  MYSQL_DATABASE=slope_search
-  ```
-- In the /server directory (server/.env):
-  ```bash
-  DB_HOST=mysql
-  DB_USER=root
-  DB_PASS=password
-  DB_NAME=slope_search
-  PORT=3000
-  ```
-
----
-
-### 4. Initialize the Database
-
-- Make the initialization script executable and run it:
-  ```bash
-  chmod +x scripts/init-db.sh
-  ```
-This loads the schema and cleaned data into the MySQL container.
-
----
-
-### 5. Run the App
-
-Option 1: Using Docker (Recommended)
 ```bash
-docker compose up --build
+# server/.env
+DB_HOST=localhost
+DB_USER=your_user
+DB_PASS=your_password
+DB_NAME=slope_search
+PORT=3000
 ```
-- Access the app at [http://localhost:4173](http://localhost:4173)
 
-Option 2: Run Manually
-
-In separate terminal tabs:
 ```bash
-# Terminal 1 - Start Backend
-cd server
-npm install
-npm run dev
+# Terminal 1 - backend (creates schema + seeds on first run)
+cd server && npm install && npm run dev
 ```
 ```bash
-# Terminal 2 - Start Frontend
-cd client
-npm install
-npm run dev
+# Terminal 2 - frontend (uses the Vite dev proxy to reach the backend)
+cd client && npm install && npm run dev
 ```
-Make sure your local MySQL instance is running and matches the .env configuration.
 
-If you're using a local MySQL setup (e.g. MySQL Workbench), ensure the following:
+## Deploy on Railway (3 services)
 
-1. Your MySQL server is running and accessible.
-2. The `server/.env` file **must** be configured with **your** local MySQL details. For example:
-  ```bash
-  DB_HOST=localhost
-  DB_USER=your_user
-  DB_PASS=your_password
-  DB_NAME=slope_search
-  PORT=3000
-  ```
-3. Make sure to manually run the schema and data load scripts in order:
+Create a Railway project with three services:
 
-  First, create the tables:
-  ```bash
-  mysql -u your_user -p slope_search < sql/createTables.sql
-  ```
-  *You will be prompted to enter your MySQL password.*
+1. **MySQL** — add the Railway MySQL plugin. Note its connection variables
+   (`MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, `MYSQLPASSWORD`, `MYSQLDATABASE`).
+2. **Backend** — deploy from this repo with **root directory `server`** (uses
+   `server/Dockerfile`). Set variables:
+   | Variable | Value |
+   |---|---|
+   | `DB_HOST` / `DB_USER` / `DB_PASS` / `DB_NAME` | map from the MySQL plugin's `MYSQL*` vars (use Railway reference variables) |
+   | `DB_PORT` | the MySQL plugin's port (only needed if not 3306) |
+   | `DB_SSL` | `true` only if your MySQL requires TLS |
+   | `CLIENT_ORIGIN` | the frontend's public URL (for CORS) |
 
-  Then, load the cleaned data:
-  ```bash
-  mysql -u your_user -p slope_search < sql/loadData.sql
-  ```
-  *You will be prompted again for the password.*
+   The app listens on Railway's injected `PORT` automatically. The backend seeds
+   the database on its first successful boot (it waits for MySQL via connect-retry,
+   so it can come up before the DB is ready).
+3. **Frontend** — deploy from this repo with **root directory `client`** (uses
+   `client/Dockerfile`, listens on Railway's injected `PORT`). Set:
+   | Variable | Value |
+   |---|---|
+   | `VITE_API_URL` | the backend's public URL, e.g. `https://your-backend.up.railway.app` (trailing slash is fine) |
+
+   `VITE_API_URL` is inlined at build time, so changing it requires a rebuild.
+
+## Regenerating the seed data
+
+Only needed when the upstream OpenSkiMap data changes — deployers never run this.
+
+1. Download `ski_areas.csv` and `runs.csv` from the about page on
+   [openskimap.org](https://openskimap.org/?about#) into `notebook/data/`.
+2. Install Python deps (`pip install -r notebook/requirements.txt`).
+3. Regenerate and commit:
+   ```bash
+   python scripts/clean_data.py        # writes server/seed/*.ndjson.gz
+   git add server/seed && git commit -m "Update seed data"
+   ```
