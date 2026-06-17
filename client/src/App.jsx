@@ -4,6 +4,10 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 
+// Backend base URL. Empty in dev so `/api` hits the Vite proxy; set VITE_API_URL
+// (e.g. https://<backend-domain>) at build time for the deployed frontend.
+const API = import.meta.env.VITE_API_URL ?? '';
+
 function App() {
   // ---USE STATES---
   const [skiAreas, setSkiAreas] = useState([]);
@@ -54,7 +58,7 @@ function App() {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch('/api/users', {
+      const res = await fetch(`${API}/api/users`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username }),
@@ -63,7 +67,7 @@ function App() {
         setUserId(data.userId);
 
         // Fetch favorites immediately for accurate button states
-        const favRes = await fetch(`/api/favorites/${data.userId}`);
+        const favRes = await fetch(`${API}/api/favorites/${data.userId}`);
         const favData = await favRes.json();
         setFavoriteIds(new Set(favData.map(f => f.skiAreaId)));
     } catch (err) {
@@ -73,7 +77,7 @@ function App() {
   // Use effect for getting regions based on the selected country (ski areas)
   useEffect(() => {
     if (selectedCountry) {
-      fetch(`/api/regions?country=${encodeURIComponent(selectedCountry)}`)
+      fetch(`${API}/api/regions?country=${encodeURIComponent(selectedCountry)}`)
         .then(res => res.json())
         .then(data => setSkiAreaRegions(data))
         .catch(err => console.error("Error fetching regions", err));
@@ -88,7 +92,7 @@ function App() {
     if (runCountry) {
       const fetchRegions = async () => {
         try {
-          const res = await fetch(`/api/regions?country=${encodeURIComponent(runCountry)}`);
+          const res = await fetch(`${API}/api/regions?country=${encodeURIComponent(runCountry)}`);
           const data = await res.json();
           setRunRegions(data);
         } catch (err) {
@@ -109,7 +113,7 @@ function App() {
         if (runCountry) query.append('country', runCountry);
         if (runRegion) query.append('region', runRegion);
 
-        const res = await fetch(`/api/ski-areas/names?${query.toString()}`);
+        const res = await fetch(`${API}/api/ski-areas/names?${query.toString()}`);
         const data = await res.json();
         setSkiAreaNames(data);
       } catch (err) {
@@ -177,7 +181,7 @@ function App() {
       // I think I need additional backend structure to really handle
       // filtering + favorites at the same time in an efficient structure.
       if (forceFavoritesOnly && userId) {
-        const favRes = await fetch(`/api/favorites/${userId}`);
+        const favRes = await fetch(`${API}/api/favorites/${userId}`);
         const favoriteData = await favRes.json();
         setSkiAreas(favoriteData);
         return;
@@ -205,7 +209,7 @@ function App() {
       if (resultLimit !== 'ALL') {
         query.append('limit', resultLimit);
       }
-      const res = await fetch(`/api/ski-areas?${query.toString()}`);
+      const res = await fetch(`${API}/api/ski-areas?${query.toString()}`);
       const data = await res.json();
       setSkiAreas(data);
     } catch (error) {
@@ -231,7 +235,7 @@ function App() {
       query.append('limit', runResultLimit);
     }
 
-    const res = await fetch(`/api/runs?${query.toString()}`);
+    const res = await fetch(`${API}/api/runs?${query.toString()}`);
     const data = await res.json();
     setRuns(data);
   };
@@ -246,7 +250,7 @@ function App() {
     if (skiAreaWebsites[skiAreaId]) return;
 
     try {
-      const res = await fetch(`/api/ski-areas/${skiAreaId}/websites`);
+      const res = await fetch(`${API}/api/ski-areas/${skiAreaId}/websites`);
       const data = await res.json();
       setSkiAreaWebsites((prev) => ({ ...prev, [skiAreaId]: data }));
     } catch (error) {
@@ -545,8 +549,8 @@ function App() {
 
                               try {
                                 const endpoint = isFavorited
-                                  ? `/api/favorites/remove`
-                                  : `/api/favorites/add`;
+                                  ? `${API}/api/favorites/remove`
+                                  : `${API}/api/favorites/add`;
 
                                 await fetch(endpoint, {
                                   method: isFavorited ? 'DELETE' : 'POST',
