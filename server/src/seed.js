@@ -32,10 +32,13 @@ async function loadTable(conn, table, columns, file) {
     return rows.length;
 }
 
-// Wait for the DB to accept connections (it may still be booting on first deploy).
-async function connectWithRetry(retries = 30, delayMs = 2000) {
+// Wait for the DB to accept connections (it may still be provisioning on first
+// deploy). If this still gives up, the process exits and the orchestrator's restart
+// policy (Railway's by default; `restart` in docker-compose) relaunches it.
+async function connectWithRetry(retries = 90, delayMs = 2000) {
     const config = {
         host: process.env.DB_HOST,
+        port: Number(process.env.DB_PORT) || 3306,
         user: process.env.DB_USER,
         password: process.env.DB_PASS,
         database: process.env.DB_NAME,

@@ -12,5 +12,6 @@ RUN npm install
 RUN npm run build
 
 EXPOSE 4173
+# Listen on Railway's injected $PORT (falls back to 4173 locally). Shell form so $PORT expands.
 # ponytail: vite preview serves the built SPA fine at this scale; swap for a static host/CDN if traffic grows.
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "4173"]
+CMD ["sh", "-c", "npm run preview -- --host 0.0.0.0 --port ${PORT:-4173}"]

@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 
 // Backend base URL. Empty in dev so `/api` hits the Vite proxy; set VITE_API_URL
 // (e.g. https://<backend-domain>) at build time for the deployed frontend.
-const API = import.meta.env.VITE_API_URL ?? '';
+const API = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 
 function App() {
   // ---USE STATES---

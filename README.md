@@ -61,24 +61,27 @@ cd client && npm install && npm run dev
 
 Create a Railway project with three services:
 
-1. **MySQL** — add the Railway MySQL plugin. Note its connection variables.
+1. **MySQL** — add the Railway MySQL plugin. Note its connection variables
+   (`MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, `MYSQLPASSWORD`, `MYSQLDATABASE`).
 2. **Backend** — deploy from this repo with **root directory `server`** (uses
    `server/Dockerfile`). Set variables:
    | Variable | Value |
    |---|---|
-   | `DB_HOST` / `DB_USER` / `DB_PASS` / `DB_NAME` | from the MySQL plugin |
+   | `DB_HOST` / `DB_USER` / `DB_PASS` / `DB_NAME` | map from the MySQL plugin's `MYSQL*` vars (use Railway reference variables) |
+   | `DB_PORT` | the MySQL plugin's port (only needed if not 3306) |
    | `DB_SSL` | `true` only if your MySQL requires TLS |
    | `CLIENT_ORIGIN` | the frontend's public URL (for CORS) |
-   | `PORT` | provided by Railway automatically |
 
-   The backend seeds the database on its first successful boot.
+   The app listens on Railway's injected `PORT` automatically. The backend seeds
+   the database on its first successful boot (it waits for MySQL via connect-retry,
+   so it can come up before the DB is ready).
 3. **Frontend** — deploy from this repo with **root directory `client`** (uses
-   `client/Dockerfile`). Set:
+   `client/Dockerfile`, listens on Railway's injected `PORT`). Set:
    | Variable | Value |
    |---|---|
-   | `VITE_API_URL` | the backend's public URL, e.g. `https://your-backend.up.railway.app` |
+   | `VITE_API_URL` | the backend's public URL, e.g. `https://your-backend.up.railway.app` (trailing slash is fine) |
 
-   `VITE_API_URL` is inlined at build time, so a change requires a rebuild.
+   `VITE_API_URL` is inlined at build time, so changing it requires a rebuild.
 
 ## Regenerating the seed data
 
