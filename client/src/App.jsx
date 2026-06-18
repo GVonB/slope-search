@@ -13,7 +13,8 @@ function App() {
   const [skiAreas, setSkiAreas] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [orderBy, setOrderBy] = useState('');
+  // Default sort so the first results land biggest-mountain-first instead of arbitrary DB order
+  const [orderBy, setOrderBy] = useState('VerticalM');
   const [sortOrder, setSortOrder] = useState('DESC');
   const [minVertical, setMinVertical] = useState('');
   // If this sounds confusing, it's not. Take all runs at a ski area, average their pitch.
@@ -216,6 +217,9 @@ function App() {
       console.error('Error fetching ski areas:', error);
     }
   };
+
+  // ponytail: one default search on mount so the landing page shows real data, not an empty "not found" state
+  useEffect(() => { handleFetchSkiAreas(false); }, []);
 
   const handleFetchRuns = async () => {
     const query = new URLSearchParams();
@@ -470,7 +474,7 @@ function App() {
                 variant="secondary"
                 onClick={() => {
                   setSelectedCountry('');
-                  setOrderBy('');
+                  setOrderBy('VerticalM');
                   setSortOrder('DESC');
                   setMinVertical('');
                   setMinMaxAveragePitch('');
