@@ -3,9 +3,10 @@ const router = express.Router();
 const skiAreaController = require('../controllers/skiAreaController');
 const skiAreaNameController = require('../controllers/skiAreaNameController');
 const skiAreaWebsiteController = require('../controllers/skiAreaWebsiteController');
+const cached = require('../utils/cache');
 
-// All ski areas
-router.get('/', skiAreaController.getSkiAreas);
+// All ski areas (cached: heavy aggregate over a static dataset)
+router.get('/', cached(skiAreaController.getSkiAreas));
 
 // Names for a ski area based on id
 router.get('/:id/names', skiAreaNameController.getNamesBySkiAreaId);
