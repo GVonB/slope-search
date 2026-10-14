@@ -22,17 +22,16 @@ function App() {
   const [minMaxAveragePitch, setMinMaxAveragePitch] = useState('');
   const [minRunCount, setMinRunCount] = useState('');
   const [minDownhillDistanceKm, setMinDownhillDistanceKm] = useState('');
-  const [userId, setUserId] = useState('');
-  const [username, setUsername] = useState('');
   // Single selected region in dropdown
   const [region, setRegion] = useState('');
   // List of regions to populate dropdown for ski areas
   const [skiAreaRegions, setSkiAreaRegions] = useState([]);
   // List of regions to populate dropdown for runs
   const [runRegions, setRunRegions] = useState([]);
-  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  // Favorites are disabled while there's no login. Revive with local state.
+  // const [favoritesOnly, setFavoritesOnly] = useState(false);
   // Handling favorites list
-  const [favoriteIds, setFavoriteIds] = useState(new Set());
+  // const [favoriteIds, setFavoriteIds] = useState(new Set());
   // TODO: rename a lot of the ski are specific states to show that
   const [resultLimit, setResultLimit] = useState('100');
   const [runResultLimit, setRunResultLimit] = useState('100');
@@ -57,24 +56,6 @@ function App() {
   const [viewMode, setViewMode] = useState('areas'); // 'areas' or 'runs'
   // ---END USE STATES
 
-  const handleLogin = async () => {
-    try {
-      const res = await fetch(`${API}/api/users`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username }),
-        });
-        const data = await res.json();
-        setUserId(data.userId);
-
-        // Fetch favorites immediately for accurate button states
-        const favRes = await fetch(`${API}/api/favorites/${data.userId}`);
-        const favData = await favRes.json();
-        setFavoriteIds(new Set(favData.map(f => f.skiAreaId)));
-    } catch (err) {
-      console.error('Login error:', err);
-    }
-  };
   // Use effect for getting regions based on the selected country (ski areas)
   useEffect(() => {
     if (selectedCountry) {
@@ -176,19 +157,8 @@ function App() {
     { label: 'All Results', value: 'ALL' },
   ];
   
-  const handleFetchSkiAreas = async (forceFavoritesOnly = favoritesOnly) => {
+  const handleFetchSkiAreas = async () => {
     try {
-      // For now, if showing favorites, filtering doesn't apply.
-      // I think I need additional backend structure to really handle
-      // filtering + favorites at the same time in an efficient structure.
-      if (forceFavoritesOnly && userId) {
-        const favRes = await fetch(`${API}/api/favorites/${userId}`);
-        const favoriteData = await favRes.json();
-        setSkiAreas(favoriteData);
-        return;
-      }
-
-      // If favorites isn't toggled, build an api call from filters
       const query = new URLSearchParams();
       if (selectedCountry) query.append('country', selectedCountry);
       if (minVertical) query.append('minVertical', minVertical);
@@ -219,7 +189,7 @@ function App() {
   };
 
   // ponytail: one default search on mount so the landing page shows real data, not an empty "not found" state
-  useEffect(() => { handleFetchSkiAreas(false); }, []);
+  useEffect(() => { handleFetchSkiAreas(); }, []);
 
   const handleFetchRuns = async () => {
     const query = new URLSearchParams();
@@ -264,23 +234,6 @@ function App() {
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
-      <div className="mb-4 flex justify-end items-center">
-        {userId ? (
-          <Button disabled variant="secondary">
-            Logged in as: {username}
-          </Button>
-        ) : (
-          <div className="flex gap-2 items-center">
-            <Input
-              placeholder="Enter username"
-              className="w-46"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <Button onClick={handleLogin}>Login</Button>
-          </div>
-        )}
-      </div>
       <h1 className="text-6xl font-bold mb-6 text-center">Slope Search 🏔️</h1>
       <div className="mb-8 flex gap-2 justify-center">
         <Button className="w-46" variant={viewMode === 'areas' ? "default" : "outline"} onClick={() => setViewMode('areas')}>
@@ -458,14 +411,10 @@ function App() {
                 onChange={(e) => setMinOrangeCount(e.target.value)}
               />
             </div>
-            {/* This ternary operator changes columns from 2 to 3 if logged in*/}
-            <div className={`grid ${userId ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-4`}>
+            <div className="grid grid-cols-2 gap-4 mb-4">
               <Button
                 className="w-full"
-                onClick={() => {
-                  setFavoritesOnly(false);
-                  handleFetchSkiAreas(false);
-                }}
+                onClick={() => handleFetchSkiAreas()}
               >
                 Search Ski Areas
               </Button>
@@ -490,19 +439,18 @@ function App() {
               >
                 Clear Filters
               </Button>
-              {/* Only show the "show favorites" button if "logged in"*/}
-              {userId && (
-                <Button
-                  variant={favoritesOnly ? "default" : "outline"}
-                  onClick={async () => {
-                    const newValue = !favoritesOnly;
-                    setFavoritesOnly(newValue);
-                    handleFetchSkiAreas(newValue);
-                  }}
-                >
-                  {favoritesOnly ? "Back to Filters" : "Show Favorites"}
-                </Button>
-              )}
+              {/* Favorites toggle — needs local-state favorites to come back
+              <Button
+                variant={favoritesOnly ? "default" : "outline"}
+                onClick={async () => {
+                  const newValue = !favoritesOnly;
+                  setFavoritesOnly(newValue);
+                  handleFetchSkiAreas(newValue);
+                }}
+              >
+                {favoritesOnly ? "Back to Filters" : "Show Favorites"}
+              </Button>
+              */}
             </div>
             
             {skiAreas.length > 0 ? (
@@ -544,49 +492,49 @@ function App() {
                         <p>Max Pitch: {degrees !== null ? `${degrees.toFixed(1)}°` : '—'}</p>
                         <p>Convention: {skiArea.runConvention ?? '—'}</p>
                         <div className="mt-4">
-                        {userId && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={async () => {
-                              const isFavorited = favoriteIds.has(skiArea.skiAreaId);
+                        {/* Favorite button — needs local-state favorites to come back
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            const isFavorited = favoriteIds.has(skiArea.skiAreaId);
 
-                              try {
-                                const endpoint = isFavorited
-                                  ? `${API}/api/favorites/remove`
-                                  : `${API}/api/favorites/add`;
+                            try {
+                              const endpoint = isFavorited
+                                ? `${API}/api/favorites/remove`
+                                : `${API}/api/favorites/add`;
 
-                                await fetch(endpoint, {
-                                  method: isFavorited ? 'DELETE' : 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({
-                                    userId,
-                                    skiAreaId: skiArea.skiAreaId,
-                                  }),
-                                });
+                              await fetch(endpoint, {
+                                method: isFavorited ? 'DELETE' : 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  userId,
+                                  skiAreaId: skiArea.skiAreaId,
+                                }),
+                              });
 
-                                const updated = new Set(favoriteIds);
-                                if (isFavorited) {
-                                  updated.delete(skiArea.skiAreaId);
-                                } else {
-                                  updated.add(skiArea.skiAreaId);
-                                }
-                                setFavoriteIds(updated);
-
-                                if (favoritesOnly) {
-                                  handleFetchSkiAreas(true);
-                                }
-                              } catch (err) {
-                                console.error('Failed to update favorite:', err);
-                                alert('Error updating favorite');
+                              const updated = new Set(favoriteIds);
+                              if (isFavorited) {
+                                updated.delete(skiArea.skiAreaId);
+                              } else {
+                                updated.add(skiArea.skiAreaId);
                               }
-                            }}
-                          >
-                            {favoriteIds.has(skiArea.skiAreaId)
-                              ? '💔 Remove Favorite'
-                              : '❤️ Add to Favorites'}
-                          </Button>
-                        )}
+                              setFavoriteIds(updated);
+
+                              if (favoritesOnly) {
+                                handleFetchSkiAreas(true);
+                              }
+                            } catch (err) {
+                              console.error('Failed to update favorite:', err);
+                              alert('Error updating favorite');
+                            }
+                          }}
+                        >
+                          {favoriteIds.has(skiArea.skiAreaId)
+                            ? '💔 Remove Favorite'
+                            : '❤️ Add to Favorites'}
+                        </Button>
+                        */}
                         </div>
                       </div>
                     </div>
